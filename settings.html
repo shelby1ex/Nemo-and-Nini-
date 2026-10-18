@@ -1,0 +1,1037 @@
+<!doctype html>
+<html lang="en" data-i18n-dom="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nemo &amp; Nini — Settings</title>
+<style>
+:root{
+  --bg:#0b0d12; --card:var(--surface); --card2:var(--surface-hover);
+  --line:var(--border); --line2:var(--border-strong);
+  --ink:var(--text); --mut:var(--text-dim); --dim:var(--text-faint);
+  --blue:var(--accent); --pink:var(--accent-2); --green:var(--success); --red:var(--danger); --amber:var(--warning);
+  --font:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,"Inter",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:13.5px/1.45 var(--font);
+  -webkit-font-smoothing:antialiased;overflow:hidden;
+  background-image:radial-gradient(760px 420px at 82% -12%,var(--accent-soft),transparent 62%),
+                   radial-gradient(620px 380px at 8% 108%,color-mix(in srgb,var(--accent-2) 11%,transparent),transparent 60%)}
+button,input,select,textarea{font:inherit;color:inherit}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--track);border-radius:99px;border:3px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:var(--track-hover);background-clip:content-box}
+
+/* ── the window's own title bar (the window is frameless) ─────────── */
+.titlebar{height:44px;flex:none;display:flex;align-items:center;gap:10px;padding:0 10px 0 15px;
+  border-bottom:1px solid var(--line);background:var(--bg);user-select:none;position:relative;z-index:6}
+.titlebar::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,var(--accent-soft),transparent 52%,color-mix(in srgb,var(--accent-2) 10%,transparent))}
+.titlebar .mark{width:21px;height:21px;border-radius:7px;flex:none;position:relative;
+  background:linear-gradient(145deg,var(--blue),var(--pink));box-shadow:0 4px 14px -5px var(--blue)}
+.titlebar .nm{position:relative;font-size:12.5px;font-weight:650;letter-spacing:.25px}
+.titlebar .nm span{font-weight:400;color:var(--dim);margin-left:7px}
+.tb-sp{flex:1;align-self:stretch}
+.tbbtn{position:relative;width:32px;height:30px;border:0;border-radius:9px;background:transparent;
+  color:var(--mut);cursor:pointer;display:grid;place-items:center;transition:background .15s,color .15s}
+.tbbtn:hover{background:var(--card2);color:var(--ink)}
+.tbbtn.x:hover{background:var(--red);color:#fff}
+.tbbtn svg{width:11px;height:11px;display:block}
+
+.app{display:flex;height:calc(100vh - 44px);animation:fade .18s ease-out}
+@keyframes fade{from{opacity:0}}
+/* ── rail ─────────────────────────────────────────── */
+.nav{width:232px;flex:none;padding:14px 12px;display:flex;flex-direction:column;gap:4px;
+  border-right:1px solid var(--line);background:var(--bg);backdrop-filter:blur(22px)}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;border-radius:10px;
+  background:transparent;color:var(--mut);cursor:pointer;text-align:left;transition:background .15s,color .15s}
+.nav-item:hover{background:var(--card);color:var(--ink)}
+.nav-item.on{background:var(--card2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.nav-item svg{width:16px;height:16px;flex:none;opacity:.9}
+.nav-item em{margin-inline-start:auto;font-style:normal;font-size:10.5px;padding:1px 6px;border-radius:99px}
+.spacer{flex:1}
+.nav-foot{display:flex;align-items:center;gap:8px;padding:10px;border-radius:11px;background:var(--card);
+  border:1px solid var(--line);font-size:11.5px;color:var(--mut)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex:none}
+.dot.on{background:var(--green);box-shadow:0 0 0 4px var(--success-soft)}
+.dot.busy{background:var(--amber);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.35}}
+
+/* ── main ─────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.head{padding:20px 26px 14px;border-bottom:1px solid var(--line)}
+.head h1{margin:0;font-size:19px;font-weight:650;letter-spacing:.2px}
+.head p{margin:4px 0 0;color:var(--mut);font-size:12.5px}
+.body{flex:1;overflow:auto;padding:18px 26px 40px}
+.page{display:none;flex-direction:column;gap:14px;max-width:820px}
+.page.on{display:flex}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card>h2{margin:0;padding:12px 16px;font-size:12px;font-weight:700;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--mut);border-bottom:1px solid var(--line);background:var(--surface)}
+.card .pad{padding:14px 16px;display:flex;flex-direction:column;gap:14px}
+.row{display:flex;align-items:center;gap:16px}
+.row + .row{padding-top:13px;border-top:1px solid var(--border-light)}
+.row-t{flex:1;min-width:0}
+.row-t b{display:block;font-weight:550;font-size:13px}
+.row-t span{display:block;color:var(--mut);font-size:11.5px;margin-top:2px}
+.row-c{flex:none;display:flex;align-items:center;gap:8px}
+.row.stack{flex-direction:column;align-items:stretch;gap:9px}
+.row.stack .row-c{justify-content:flex-start;flex-wrap:wrap}
+
+/* controls */
+.sw{position:relative;display:inline-flex;flex:none}
+.sw input{position:absolute;opacity:0;width:0;height:0}
+.sw i{width:42px;height:24px;border-radius:99px;background:var(--track);
+  border:1px solid var(--line);position:relative;transition:.18s;cursor:pointer;display:block}
+.sw i::after{content:"";position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;
+  background:var(--text);transition:.18s;box-shadow:0 2px 6px rgba(0,0,0,.45)}
+.sw input:checked + i{background:linear-gradient(120deg,var(--blue),color-mix(in srgb,var(--blue) 72%,#000));border-color:transparent}
+.sw input:checked + i::after{transform:translateX(18px)}
+.sw input:focus-visible + i{outline:2px solid var(--blue);outline-offset:2px}
+
+input[type=text],input[type=password],input[type=number],select,textarea{
+  background:var(--code-bg);border:1px solid var(--line);border-radius:9px;padding:7px 10px;outline:0;min-width:0}
+input[type=text]:focus,input[type=password]:focus,input[type=number]:focus,select:focus,textarea:focus{
+  border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring)}
+select{appearance:none;padding-right:26px;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--mut) 50%),linear-gradient(135deg,var(--mut) 50%,transparent 50%);
+  background-position:calc(100% - 14px) 14px,calc(100% - 9px) 14px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+input[type=range]{appearance:none;width:150px;height:4px;border-radius:99px;background:var(--track);outline:0}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:15px;height:15px;border-radius:50%;background:var(--text);
+  box-shadow:0 1px 5px rgba(0,0,0,.5);cursor:pointer;margin-top:-.5px}
+.val{min-width:44px;text-align:end;color:var(--mut);font-variant-numeric:tabular-nums;font-size:12px}
+
+.btn{border:1px solid var(--line2);background:var(--card2);border-radius:9px;padding:7px 12px;cursor:pointer;
+  transition:.15s;white-space:nowrap}
+.btn:hover{background:var(--track)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:linear-gradient(120deg,var(--blue),color-mix(in srgb,var(--blue) 72%,#000));
+  border-color:transparent;font-weight:600;color:var(--accent-contrast)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{border-color:color-mix(in srgb,var(--red) 50%,transparent);background:color-mix(in srgb,var(--red) 16%,transparent);color:var(--red)}
+.btn.danger:hover{background:color-mix(in srgb,var(--red) 26%,transparent)}
+.btn.tiny{padding:5px 9px;font-size:11.5px;border-radius:8px}
+.btn[disabled]{opacity:.45;cursor:default}
+
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:99px;font-size:11.5px;
+  background:var(--card2);border:1px solid var(--line)}
+.pill.ok{background:var(--success-soft);border-color:color-mix(in srgb,var(--green) 35%,transparent);color:var(--green)}
+.pill.off{background:var(--surface-hover);color:var(--mut)}
+.pill.err{background:var(--danger-soft);border-color:color-mix(in srgb,var(--red) 40%,transparent);color:var(--red)}
+
+.note{font-size:11.5px;color:var(--dim);padding:0 2px}
+.mono{font-family:ui-monospace,"Cascadia Code",Consolas,monospace;font-size:11.5px}
+.log{max-height:190px;overflow:auto;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;
+  padding:10px 12px;white-space:pre-wrap;color:var(--ink);opacity:.85;margin:0}
+.plist{display:flex;flex-direction:column;gap:8px;max-height:330px;overflow:auto;padding-right:4px}
+.prow{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--line);
+  border-radius:11px;padding:9px 11px}
+.prow .nm{flex:1;min-width:0;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prow input{width:210px}
+.srch{width:100%}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kv{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;color:var(--mut)}
+.kv b{color:var(--ink);font-weight:600}
+
+/* ── appearance: mode + theme gallery ──────────────────────────── */
+.seg{display:inline-flex;background:var(--card2);border-radius:10px;padding:3px;gap:2px}
+.seg button{appearance:none;border:0;background:transparent;padding:6px 15px;border-radius:8px;font-size:12.5px;
+  cursor:pointer;color:var(--mut);font-weight:550;transition:background .15s,color .15s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:var(--blue);color:#fff}
+
+.themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(126px,1fr));gap:11px}
+.tcard{position:relative;display:flex;flex-direction:column;gap:8px;padding:9px;border-radius:13px;cursor:pointer;
+  background:var(--card2);border:1px solid var(--line);text-align:left;transition:transform .18s,border-color .18s,box-shadow .18s}
+.tcard:hover{transform:translateY(-2px);border-color:var(--blue)}
+.tcard.on{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue),0 8px 20px -12px var(--blue)}
+/* the thumbnail: a mini window mock drawn in that theme's own colours */
+.tk-thumb{position:relative;display:flex;height:64px;border-radius:9px;overflow:hidden;border:1px solid rgba(0,0,0,.12)}
+.tk-side{width:22px;flex:none}
+.tk-main{flex:1;min-width:0;padding:7px 8px;display:flex;flex-direction:column;gap:4px;position:relative}
+.tk-bar{height:4px;width:52%;border-radius:99px}
+.tk-msg{height:9px;border-radius:5px}
+.tk-a{width:64%} .tk-u{width:44%;align-self:flex-end;margin-top:auto}
+.tk-dot{position:absolute;left:7px;bottom:6px;width:7px;height:7px;border-radius:50%}
+.tname{font-size:12px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tcard .tick{position:absolute;top:14px;right:14px;width:17px;height:17px;border-radius:50%;background:var(--blue);
+  color:#fff;display:none;place-items:center;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.tcard.on .tick{display:grid}
+.tcard .tick svg{width:10px;height:10px}
+
+/* ── the free-model picker ─────────────────────────────────────── */
+.mpick{position:relative;width:100%}
+.mpick>button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;cursor:pointer;
+  background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:9px;padding:8px 11px;transition:border-color .15s}
+.mpick>button:hover{border-color:var(--blue)}
+.mpick>button .cur{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mpick>button .cur.empty{color:var(--dim)}
+.mpick>button svg{width:11px;height:11px;flex:none;color:var(--mut);transition:transform .18s}
+.mpick.open>button svg{transform:rotate(180deg)}
+.mpop{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:var(--bg);
+  border:1px solid var(--line2);border-radius:12px;box-shadow:0 24px 60px -20px #000;padding:9px;display:none}
+.mpick.open .mpop{display:block}
+.mpop input{width:100%;margin-bottom:7px}
+.mlist{max-height:262px;overflow:auto;display:flex;flex-direction:column;gap:2px;padding-right:4px}
+.mgrp{font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--dim);
+  padding:7px 8px 3px;position:sticky;top:0;background:var(--bg)}
+.mrow{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:0;background:transparent;
+  padding:6px 8px;border-radius:8px;cursor:pointer;font-size:12.5px;color:var(--ink);transition:background .12s}
+.mrow:hover{background:var(--card2)}
+.mrow.on{background:rgba(91,155,255,.18);color:#cfe0ff}
+.mrow .prov{margin-left:auto;font-size:10.5px;color:var(--dim);flex:none}
+.mrow .mk{width:13px;height:13px;border-radius:4px;border:1px solid var(--line2);flex:none;display:grid;place-items:center}
+.mrow.on .mk{background:var(--blue);border-color:var(--blue)}
+.mrow.on .mk svg{width:9px;height:9px;color:#fff}
+.mrow .mk svg{display:none}
+.mrow.on .mk svg{display:block}
+.mempty{padding:14px 8px;text-align:center;color:var(--dim);font-size:12px}
+
+/* ── the engine update card ─────────────────────────────────────── */
+.upd{display:flex;flex-direction:column;gap:9px}
+.upd .kv{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:8px 11px}
+.updmsg{font-size:12px;color:var(--dim);min-height:15px;line-height:1.4}
+.updbar{display:none;height:5px;border-radius:99px;background:rgba(128,128,128,.18);overflow:hidden}
+.updbar.on{display:block}
+.updbar i{display:block;height:100%;width:0;background:var(--blue);border-radius:99px;transition:width .2s}
+.updbar.indet i{width:34%;animation:updbarslide 1.1s ease-in-out infinite}
+@keyframes updbarslide{0%{margin-left:-34%}100%{margin-left:100%}}
+.updacts{display:flex;gap:8px}
+.updacts .btn{min-width:130px}
+.updacts .btn:disabled{opacity:.5;cursor:default}
+
+/* agent description under the select */
+.agdesc{font-size:11.5px;color:var(--dim);line-height:1.5;white-space:pre-line}
+
+/* toast */
+#toasts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:50}
+.toast{background:var(--bg);border:1px solid var(--line2);border-radius:11px;padding:9px 13px;
+  font-size:12.5px;box-shadow:0 18px 40px -14px #000d;animation:in .2s ease-out;max-width:340px}
+.toast.ok{border-color:color-mix(in srgb,var(--green) 45%,transparent)}
+.toast.err{border-color:color-mix(in srgb,var(--red) 50%,transparent)}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+
+/* ── right-to-left ─────────────────────────────────────────────────────────
+   The layout is flexbox, so most of it flips by itself. Only the handful of
+   places that pin a side — the rail's edge, the select's arrow, the toast
+   stack — are restated here. */
+[dir=rtl] .titlebar{padding:0 15px 0 10px}
+[dir=rtl] .titlebar .nm span{margin-left:0;margin-right:7px}
+[dir=rtl] .nav{border-right:0;border-left:1px solid var(--line)}
+[dir=rtl] .nav-item{text-align:right}
+[dir=rtl] select{padding-right:10px;padding-left:26px;
+  background-position:14px 14px,19px 14px}
+[dir=rtl] .plist,[dir=rtl] .mlist{padding-right:0;padding-left:4px}
+[dir=rtl] .mrow{text-align:right}
+[dir=rtl] .mrow .prov{margin-left:0;margin-right:auto}
+[dir=rtl] .mpick>button{text-align:right}
+[dir=rtl] #toasts{right:auto;left:16px}
+[dir=rtl] .titlebar .mark{transform:scaleX(-1)}
+</style>
+</head>
+<body>
+<div class="titlebar" data-tauri-drag-region>
+  <div class="mark" data-tauri-drag-region></div>
+  <div class="nm" data-tauri-drag-region>Nemo &amp; Nini<span>Settings</span></div>
+  <div class="tb-sp" data-tauri-drag-region></div>
+  <button class="tbbtn" id="tbMin" title="Minimise" aria-label="Minimise"><svg viewBox="0 0 12 12"><path d="M2.5 6h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+  <button class="tbbtn x" id="tbClose" title="Close" aria-label="Close"><svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+</div>
+<div class="app">
+  <aside class="nav">
+    <button class="nav-item on" data-page="ai">
+      <svg viewBox="0 0 16 16"><path d="M8 1.6l1.5 3.4 3.4 1.5-3.4 1.5L8 11.4 6.5 8 3.1 6.5 6.5 5z" fill="currentColor"/><circle cx="12.6" cy="12.4" r="1.5" fill="currentColor" opacity=".6"/></svg>
+      AI engine</button>
+    <button class="nav-item" data-page="general">
+      <svg viewBox="0 0 16 16"><path d="M8 5.4a2.6 2.6 0 100 5.2 2.6 2.6 0 000-5.2z" fill="currentColor"/><path d="M13.6 9.3l1.2.9-1.3 2.2-1.4-.5a4.6 4.6 0 01-1.2.7l-.2 1.5H7.3l-.2-1.5a4.6 4.6 0 01-1.2-.7l-1.4.5L3.2 10l1.2-.9a4.7 4.7 0 010-1.4L3.2 6.8l1.3-2.2 1.4.5c.37-.29.78-.52 1.2-.7l.2-1.5h3.4l.2 1.5c.43.18.84.41 1.2.7l1.4-.5 1.3 2.2-1.2.9a4.7 4.7 0 010 1.4z" fill="currentColor" opacity=".45"/></svg>
+      General</button>
+    <button class="nav-item" data-page="companions">
+      <svg viewBox="0 0 16 16"><circle cx="5.6" cy="6" r="2.6" fill="currentColor"/><circle cx="11" cy="7.4" r="2.1" fill="currentColor" opacity=".55"/><path d="M1.4 13.6c.3-2.3 2-3.7 4.2-3.7s3.9 1.4 4.2 3.7z" fill="currentColor"/><path d="M9.2 13.6c.2-1.7 1.5-2.8 3.2-2.8 1.6 0 2.8 1 3 2.8z" fill="currentColor" opacity=".55"/></svg>
+      Companions</button>
+    <button class="nav-item" data-page="desktop">
+      <svg viewBox="0 0 16 16"><rect x="1.4" y="2.6" width="13.2" height="9" rx="1.6" fill="currentColor" opacity=".5"/><rect x="5" y="4" width="8.2" height="6" rx="1" fill="currentColor"/><path d="M5.6 13.4h4.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Desktop &amp; taskbar</button>
+    <button class="nav-item" data-page="appearance">
+      <svg viewBox="0 0 16 16"><path d="M8 1.8c-3.4 0-6.2 2.7-6.2 6s2.8 6 6.2 6c1 0 1.6-.7 1.6-1.5 0-.4-.2-.7-.4-1-.2-.2-.3-.5-.3-.8 0-.8.6-1.4 1.4-1.4h1.2c1.5 0 2.7-1.2 2.7-2.6C14.2 4 11.5 1.8 8 1.8z" fill="currentColor" opacity=".55"/><circle cx="5.3" cy="7" r="1.1" fill="currentColor"/><circle cx="8.4" cy="5.2" r="1.1" fill="currentColor"/></svg>
+      Appearance</button>
+    <button class="nav-item" data-page="advanced">
+      <svg viewBox="0 0 16 16"><path d="M8 1.8l5.4 2v3.6c0 3.3-2.2 5.7-5.4 6.8-3.2-1.1-5.4-3.5-5.4-6.8V3.8z" fill="currentColor" opacity=".5"/><path d="M5.6 7.9l1.8 1.8 3.2-3.4" stroke="#0b0d12" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Advanced</button>
+    <div class="spacer"></div>
+    <div class="nav-foot"><span class="dot" id="engDot"></span><span id="engTxt">Engine stopped</span></div>
+  </aside>
+
+  <main class="main">
+    <header class="head"><h1 id="hTitle">AI engine</h1><p id="hSub">opencode runs locally. Everything stays on this machine.</p></header>
+    <div class="body">
+
+      <!-- ══ AI ══ -->
+      <section class="page on" data-page="ai">
+        <div class="card">
+          <h2>Engine</h2>
+          <div class="pad">
+            <div class="row">
+              <div class="row-t"><b>Status</b><span id="engMeta">Not started yet.</span></div>
+              <div class="row-c">
+                <span class="pill off" id="engPill">stopped</span>
+                <button class="btn primary" id="engToggle">Start</button>
+                <button class="btn" id="engRestart">Restart</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Start with the app</b><span>Bring the engine up as soon as Nemo &amp; Nini opens.</span></div>
+              <div class="row-c"><label class="sw"><input type="checkbox" id="auto_start"><i></i></label></div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Runtime</b><span>Leave empty for the copy the app manages. Point it at a binary only to override.</span></div>
+              <div class="row-c">
+                <input type="text" id="runtime_path" placeholder="opencode.exe" style="width:260px">
+                <button class="btn tiny" id="runtimeBrowse">Browse…</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Port</b><span>0 picks a free port on every launch.</span></div>
+              <div class="row-c"><input type="number" id="port" min="0" max="65535" style="width:100px"></div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Workspace</b><span>The folder the engine works in. Empty = your home folder.</span></div>
+              <div class="row-c">
+                <input type="text" id="workspace" placeholder="C:\Users\you" style="width:260px">
+                <button class="btn tiny" id="wsBrowse">Browse…</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Engine update</h2>
+          <div class="pad">
+            <div class="upd">
+              <div class="kv"><span>Installed version</span><b id="updCur">–</b></div>
+              <div class="kv"><span>Latest version</span><b id="updLatest">–</b></div>
+              <div class="updmsg" id="updMsg"></div>
+              <div class="updbar" id="updBar"><i id="updFill"></i></div>
+              <div class="row-c updacts">
+                <button class="btn" id="updCheck">Check for updates</button>
+                <button class="btn primary" id="updRun">Download</button>
+              </div>
+              <div class="note">The runtime lives in the app's own data folder, never in your projects.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Model</h2>
+          <div class="pad">
+            <div class="row stack">
+              <div class="row-t"><b>Default model</b><span>Every model listed here costs nothing to run.</span></div>
+              <div class="row-c">
+                <div class="mpick" id="modelPick">
+                  <button type="button" id="modelBtn">
+                    <span class="cur empty">Choose a free model…</span>
+                    <svg viewBox="0 0 12 12"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <div class="mpop">
+                    <input type="text" id="modelSearch" placeholder="Search models" autocomplete="off" spellcheck="false">
+                    <div class="mlist" id="modelList"><div class="mempty">Start the engine to list free models.</div></div>
+                  </div>
+                </div>
+                <button class="btn tiny" id="modelRefresh">Refresh</button>
+              </div>
+            </div>
+            <div class="row stack">
+              <div class="row-t"><b>Agent</b><span>opencode's default agent.</span></div>
+              <div class="row-c"><select id="agent" style="width:330px"><option value="">Default</option></select></div>
+              <div class="agdesc" id="agentNote"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Providers &amp; API keys</h2>
+          <div class="pad">
+            <div class="row stack">
+              <div class="row-t"><b>Connected providers</b><span>Keys are handed straight to the engine — they are never written to the app's settings file.</span></div>
+              <input type="text" class="srch" id="provSearch" placeholder="Filter providers…">
+              <div class="plist" id="provList"><div class="note">Start the engine to list providers.</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ GENERAL ══ -->
+      <section class="page" data-page="general">
+        <div class="card">
+          <h2>Startup &amp; sound</h2>
+          <div class="pad">
+            <div class="row">
+              <div class="row-t"><b>Open at login</b><span>Start Nemo &amp; Nini when you sign in to Windows.</span></div>
+              <div class="row-c"><label class="sw"><input type="checkbox" id="launch_at_startup"><i></i></label></div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Sound</b><span>Little voices, slaps and reactions.</span></div>
+              <div class="row-c"><label class="sw"><input type="checkbox" id="sound"><i></i></label></div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Volume</b><span>How loud they get.</span></div>
+              <div class="row-c"><input type="range" id="volume" min="0" max="1" step="0.05"><span class="val" id="volumeV"></span></div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Language</b><span>For their speech and the interface, where translated.</span></div>
+              <div class="row-c"><select id="language" style="width:190px">
+                <option value="en">English</option><option value="fr">Français</option>
+                <option value="ar">العربية</option>
+              </select></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ COMPANIONS ══ -->
+      <section class="page" data-page="companions">
+        <div class="card">
+          <h2>On the desktop</h2>
+          <div class="pad">
+            <div class="row">
+              <div class="row-t"><b>Everyone out at launch</b><span>Nemo and Nini start loose on your desktop instead of waiting in the island.</span></div>
+              <div class="row-c"><label class="sw"><input type="checkbox" id="both_out_on_launch"><i></i></label></div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Size</b><span>How big they are on screen.</span></div>
+              <div class="row-c"><input type="range" id="comp_size" min="0.6" max="1.5" step="0.05"><span class="val" id="comp_sizeV"></span></div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Walk speed</b><span>Nemo runs when he wants; this is the general pace.</span></div>
+              <div class="row-c"><input type="range" id="walk_speed" min="0.4" max="2" step="0.05"><span class="val" id="walk_speedV"></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ DESKTOP ══ -->
+      <section class="page" data-page="desktop">
+        <div class="card">
+          <h2>Real windows</h2>
+          <div class="pad">
+            <div class="row">
+              <div class="row-t"><b>Click through</b><span>Let every click reach your apps. Turn this off and the overlay swallows them — useful for testing only.</span></div>
+              <div class="row-c"><label class="sw"><input type="checkbox" id="click_through"><i></i></label></div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Sit on your windows</b><span>They climb onto the title bar of whatever is open and ride along when it moves.</span></div>
+              <div class="row-c"><label class="sw"><input type="checkbox" id="perch_windows"><i></i></label></div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Floor offset</b><span>Nudge the line they walk on, relative to the top of the real taskbar.</span></div>
+              <div class="row-c"><input type="range" id="floor_offset" min="-30" max="30" step="1"><span class="val" id="floor_offsetV"></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ APPEARANCE ══ -->
+      <section class="page" data-page="appearance">
+        <div class="card">
+          <h2>Mode</h2>
+          <div class="pad">
+            <div class="row">
+              <div class="row-t"><b>Dark or light</b><span>Light, dark, or follow Windows.</span></div>
+              <div class="row-c">
+                <span class="seg" id="modeSeg">
+                  <button data-mode="light">Light</button>
+                  <button data-mode="dark" class="on">Dark</button>
+                  <button data-mode="system">System</button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Themes</h2>
+          <div class="pad">
+            <div class="note">The look of the island and of Settings. Pick one and both change together.</div>
+            <div class="themes" id="themeGrid"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Island</h2>
+          <div class="pad">
+            <div class="row">
+              <div class="row-t"><b>Distance from the top</b><span>How far the island hangs from the top edge of the screen.</span></div>
+              <div class="row-c"><input type="range" id="island_top" min="0" max="240" step="2"><span class="val" id="island_topV"></span></div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Opacity</b><span>Make it blend into the wallpaper.</span></div>
+              <div class="row-c"><input type="range" id="island_opacity" min="0.2" max="1" step="0.02"><span class="val" id="island_opacityV"></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Companions</h2>
+          <div class="pad">
+            <div class="row">
+              <div class="row-t"><b>Opacity</b><span>How solid Nemo and Nini look on the desktop.</span></div>
+              <div class="row-c"><input type="range" id="comp_opacity" min="0.2" max="1" step="0.02"><span class="val" id="comp_opacityV"></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ ADVANCED ══ -->
+      <section class="page" data-page="advanced">
+        <div class="card">
+          <h2>Engine log</h2>
+          <div class="pad">
+            <pre class="log mono" id="engLog">—</pre>
+            <div class="row-c"><button class="btn tiny" id="logRefresh">Refresh</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Folders</h2>
+          <div class="pad">
+            <div class="row">
+              <div class="row-t"><b>Settings &amp; engine data</b><span>Where this window writes its file.</span></div>
+              <div class="row-c"><button class="btn" data-open="config">Open folder</button></div>
+            </div>
+            <div class="row">
+              <div class="row-t"><b>Logs</b><span>Engine stderr and app logs.</span></div>
+              <div class="row-c"><button class="btn" data-open="logs">Open folder</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>About</h2>
+          <div class="pad">
+            <div class="kv"><span>App</span><b>Nemo &amp; Nini 0.1.0</b></div>
+            <div class="kv"><span>Engine</span><b id="aboutEng">—</b></div>
+            <div class="row">
+              <div class="row-t"><b>Reset everything</b><span>Puts every setting back to its default. Nothing else is touched.</span></div>
+              <div class="row-c"><button class="btn danger" id="resetAll">Reset</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+<div id="toasts"></div>
+
+<script id="settingsjs" type="module">
+import { open as openDialog } from "@tauri-apps/plugin-dialog";
+import * as Theme from "./src/theme.js";
+import * as I18n from "./src/i18n.js";
+import "./src/appearance.js";
+
+(() => {
+  const T = window.__TAURI__;
+  const invoke = (cmd, args) => T.core.invoke(cmd, args || {});
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+
+  /* ── the window's own frame ─────────────────────────── */
+  $('#tbMin').addEventListener('click', () => invoke('minimize_settings'));
+  $('#tbClose').addEventListener('click', () => invoke('close_settings'));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') invoke('close_settings') });
+
+  /* ── toasts ─────────────────────────────────────────── */
+  function toast(msg, kind) {
+    const el = document.createElement('div');
+    el.className = 'toast ' + (kind || '');
+    el.textContent = I18n.t(msg);          // whole sentences translate; raw errors pass through
+    $('#toasts').appendChild(el);
+    setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 320) }, kind === 'err' ? 6000 : 2600);
+  }
+
+  /* ── pages ──────────────────────────────────────────── */
+  const TITLES = {
+    ai: ['AI engine', 'opencode runs locally. Everything stays on this machine.'],
+    general: ['General', 'Startup, sound and the language they speak.'],
+    companions: ['Companions', 'Nemo and Nini on your real desktop.'],
+    desktop: ['Desktop & taskbar', 'How the overlay talks to your real windows.'],
+    appearance: ['Appearance', 'The island and the two of them.'],
+    advanced: ['Advanced', 'Logs, folders and the big reset.'],
+  };
+  /* The page the heading belongs to. Changing the language repaints the heading
+     from its source, so it has to be told which page is actually showing —
+     otherwise switching language on the Appearance page would snap the heading
+     back to "AI engine". */
+  let curPage = 'ai';
+  function paintHeading() {
+    const t = TITLES[curPage] || ['', ''];
+    $('#hTitle').textContent = I18n.t(t[0]); $('#hSub').textContent = I18n.t(t[1]);
+  }
+  $$('.nav-item').forEach(b => b.addEventListener('click', () => {
+    $$('.nav-item').forEach(x => x.classList.toggle('on', x === b));
+    $$('.page').forEach(p => p.classList.toggle('on', p.dataset.page === b.dataset.page));
+    curPage = b.dataset.page;
+    /* The heading is rewritten on every switch, so it is translated here
+       rather than left to the one-off pass over the static page. */
+    paintHeading();
+    if (b.dataset.page === 'ai') refreshProviders();
+    if (b.dataset.page === 'advanced') refreshLog();
+  }));
+
+  /* ── settings model ─────────────────────────────────── */
+  const KEYS = ['runtime_path','port','auto_start','model','agent','workspace','launch_at_startup','sound','volume',
+    'language','comp_size','walk_speed','both_out_on_launch','click_through','perch_windows','floor_offset',
+    'island_top','island_opacity','comp_opacity','theme','mode'];
+  let S = {};
+
+  const fmt = {
+    volume: v => Math.round(v * 100) + '%',
+    comp_size: v => (+v).toFixed(2) + '×',
+    walk_speed: v => (+v).toFixed(2) + '×',
+    floor_offset: v => (v > 0 ? '+' : '') + Math.round(v) + ' px',
+    island_top: v => Math.round(v) + ' px',
+    island_opacity: v => Math.round(v * 100) + '%',
+    comp_opacity: v => Math.round(v * 100) + '%',
+  };
+
+  function paint(el) {
+    const k = el.id, v = S[k];
+    if (el.type === 'checkbox') el.checked = !!v;
+    else el.value = v === undefined || v === null ? '' : v;
+    const lab = $('#' + k + 'V');
+    if (lab) lab.textContent = fmt[k] ? fmt[k](el.value) : el.value;
+  }
+
+  function paintAll() { KEYS.forEach(k => { const el = $('#' + k); if (el) paint(el) }) }
+
+  let timer = null;
+  async function flush() {
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      try { await invoke('settings_save', { settings: S }) }
+      catch (e) { toast(I18n.t('Could not save: ') + e, 'err') }
+    }, 220);
+  }
+
+  KEYS.forEach(k => {
+    const el = $('#' + k); if (!el) return;
+    const ev = (el.type === 'range' || el.type === 'text' || el.type === 'number') ? 'input' : 'change';
+    el.addEventListener(ev, () => {
+      S[k] = el.type === 'checkbox' ? el.checked
+        : (el.type === 'range' || el.type === 'number') ? (el.value === '' ? 0 : +el.value)
+        : el.value;
+      const lab = $('#' + k + 'V');
+      if (lab && fmt[k]) lab.textContent = fmt[k](el.value);
+      flush();
+    });
+  });
+
+  /* ── appearance: mode + theme ──────────────────────── */
+  /* The gallery is drawn in the *current* mode, so every card shows the colours
+     you'd actually get — a light theme shows light in dark mode's gallery only
+     if you ask for light. Switching the mode redraws the cards with it. */
+  function renderThemes() {
+    const grid = $('#themeGrid');
+    const mode = S.mode || 'dark';
+    grid.innerHTML = Theme.list().map(t => `
+      <button type="button" class="tcard${S.theme === t.id ? ' on' : ''}" data-theme-id="${t.id}">
+        <span class="tick"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.4 2.4 4.6-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        ${Theme.thumb(t.id, mode)}
+        <span class="tname">${t.label}</span>
+      </button>`).join('');
+  }
+
+  $$('#modeSeg button').forEach(b => b.addEventListener('click', () => {
+    S.mode = b.dataset.mode;
+    $$('#modeSeg button').forEach(x => x.classList.toggle('on', x === b));
+    renderThemes();                       // redraw in the new mode
+    Theme.apply(S.theme, S.mode);
+    flush();
+  }));
+
+  $('#themeGrid').addEventListener('click', e => {
+    const card = e.target.closest('[data-theme-id]');
+    if (!card) return;
+    S.theme = card.dataset.themeId;
+    renderThemes();
+    Theme.apply(S.theme, S.mode);
+    flush();
+  });
+
+  function paintAppearance() {
+    const m = S.mode || 'dark';
+    $$('#modeSeg button').forEach(x => x.classList.toggle('on', x.dataset.mode === m));
+    renderThemes();
+  }
+
+  /* ── engine ─────────────────────────────────────────── */
+  let busy = false;
+  let lastStatus = {};              // kept so a language change can repaint it
+  /* This repaints every few seconds from the poller below, so every string it
+     writes goes through the translator — otherwise the language would snap
+     back to English a moment after you chose it. */
+  function engineView(info) {
+    lastStatus = info || {};
+    const dot = $('#engDot'), txt = $('#engTxt'), pill = $('#engPill'), meta = $('#engMeta'), tog = $('#engToggle');
+    dot.className = 'dot' + (busy ? ' busy' : info.running ? ' on' : '');
+    txt.textContent = I18n.t(busy ? 'Working…' : info.running ? 'Engine running' : 'Engine stopped');
+    pill.className = 'pill ' + (info.running ? 'ok' : info.error ? 'err' : 'off');
+    pill.textContent = info.running
+      ? (I18n.t('running · ') + info.port)
+      : info.error ? I18n.t('error') : I18n.t('stopped');
+    meta.textContent = info.running
+      ? ('opencode ' + (info.version || '?') + ' · ' + (info.path || '') )
+      : (info.error || I18n.t('Not started yet.'));
+    tog.textContent = I18n.t(info.running ? 'Stop' : 'Start');
+    tog.disabled = busy;
+    $('#aboutEng').textContent = info.running ? ('opencode ' + (info.version || '?') + ' on port ' + info.port) : 'not running';
+    if (info.log) { $('#engLog').textContent = info.log.slice(-120).join('\n') || '—'; }
+  }
+
+  async function status() { try { engineView(await invoke('oc_status')) } catch (e) { toast('' + e, 'err') } }
+
+  $('#engToggle').addEventListener('click', async () => {
+    busy = true; status();
+    try {
+      const info = await invoke('oc_status');
+      await (info.running ? invoke('oc_stop') : invoke('oc_start'));
+      toast(info.running ? 'Engine stopped.' : 'Engine started.', 'ok');
+    } catch (e) { toast('' + e, 'err') }
+    busy = false; await status(); refreshProviders();
+  });
+  $('#engRestart').addEventListener('click', async () => {
+    busy = true; status();
+    try { await invoke('oc_restart'); toast('Engine restarted.', 'ok') }
+    catch (e) { toast('' + e, 'err') }
+    busy = false; await status(); refreshProviders();
+  });
+  $('#logRefresh').addEventListener('click', refreshLog);
+  async function refreshLog() { const i = await invoke('oc_status'); $('#engLog').textContent = (i.log || []).slice(-120).join('\n') || '—' }
+
+  if (T.event) {
+    T.event.listen('oc:status', e => engineView(e.payload || {}));
+  }
+
+  /* ── engine update ───────────────────────────────────── */
+  /* The runtime is fetched from this window — Download when it is missing,
+     Update engine when GitHub has something newer — and Rust reports every
+     step through `oc:update`, so this card only ever paints what it is told.
+     No polling: the flow pushes its own progress. */
+  let UPD = null;
+  const UPD_BUSY = ['checking', 'downloading', 'verifying', 'swapping', 'restarting'];
+
+  function paintUpdate() {
+    const u = UPD || {};
+    $('#updCur').textContent = u.current || '–';
+    $('#updLatest').textContent = u.latest || '–';
+
+    const pct = u.bytesTotal ? Math.round((u.bytesDone || 0) / u.bytesTotal * 100) : 0;
+    let msg = '';
+    switch (u.state) {
+      case 'checking': msg = I18n.t('Checking…'); break;
+      case 'downloading': msg = I18n.t('Downloading…') + (pct ? ' ' + pct + '%' : ''); break;
+      case 'verifying': msg = I18n.t('Verifying…'); break;
+      case 'swapping': msg = I18n.t('Installing…'); break;
+      case 'restarting': msg = I18n.t('Restarting the engine…'); break;
+      case 'uptodate': msg = I18n.t('Up to date') + (u.latest ? ' (' + u.latest + ')' : ''); break;
+      case 'applied': msg = I18n.t('Engine updated.') + (u.latest ? ' (' + u.latest + ')' : ''); break;
+      case 'rolled_back':
+        msg = I18n.t('Update failed — rolled back to the previous version.') + (u.message ? ' — ' + u.message : '');
+        break;
+      case 'error': msg = I18n.t('Update failed.') + (u.message ? ' — ' + u.message : ''); break;
+      default:
+        if (u.installed === false) msg = I18n.t('The opencode runtime is not installed yet. Press Download to get it.');
+        else if (u.latest && u.current && u.latest !== u.current) msg = I18n.t('A new version is available.');
+    }
+    $('#updMsg').textContent = msg;
+
+    const busy = UPD_BUSY.includes(u.state);
+    const bar = $('#updBar');
+    bar.classList.toggle('on', busy);
+    bar.classList.toggle('indet', busy && !u.bytesTotal);
+    $('#updFill').style.width = u.bytesTotal ? pct + '%' : '';
+
+    const run = $('#updRun');
+    let label;
+    let dis = busy;
+    if (u.installed === false) label = 'Download';
+    else if (u.state === 'uptodate' || (u.latest && u.current && u.latest === u.current)) {
+      label = 'Up to date'; dis = true;
+    } else label = 'Update engine';
+    run.textContent = I18n.t(label);
+    run.disabled = dis;
+    $('#updCheck').disabled = busy;
+  }
+
+  async function updPaint() {
+    try { UPD = await invoke('oc_update_status') } catch (e) { /* leave the card at its default */ }
+    paintUpdate();
+  }
+
+  if (T.event) T.event.listen('oc:update', e => { UPD = e.payload || {}; paintUpdate() });
+
+  $('#updCheck').addEventListener('click', async () => {
+    try { UPD = await invoke('oc_update_check') } catch (e) { /* the card already says why */ }
+    paintUpdate();
+  });
+  $('#updRun').addEventListener('click', async () => {
+    let u = null;
+    try { u = await invoke('oc_update_run') } catch (e) { toast('' + e, 'err') }
+    if (u) UPD = u;
+    paintUpdate();
+    if (UPD && UPD.state === 'applied') {
+      toast('Engine updated.', 'ok');
+      status(); refreshProviders();
+    }
+  });
+
+  /* ── providers ──────────────────────────────────────── */
+  let PROV = [], CONNECTED = [];
+  async function refreshProviders() {
+    const list = $('#provList');
+    let info; try { info = await invoke('oc_status') } catch (e) { info = {} }
+    if (!info.running) { list.innerHTML = '<div class="note">' + I18n.t('Start the engine to list providers.') + '</div>'; fillModels([]); fillAgents([]); return }
+    list.innerHTML = '<div class="note">' + I18n.t('Loading providers…') + '</div>';
+    try {
+      const p = await invoke('oc_providers');
+      PROV = p.all || []; CONNECTED = p.connected || [];
+      fillModels(PROV);
+      renderProviders();
+      const cfg = await invoke('oc_config').catch(() => ({}));
+      if (cfg.default_agent) { S.agent = cfg.default_agent; paint($('#agent')); }
+      /* The engine may already have a model configured (it ships with a free
+         default), so the picker shows what is actually in use rather than
+         asking you to choose one you never chose. */
+      if (!S.model && cfg.model) { S.model = cfg.model; paintModelBtn(); renderModelList(); }
+      fillAgents(await invoke('oc_agents').catch(() => []));
+    } catch (e) {
+      list.innerHTML = '<div class="note">' + I18n.t('Could not reach the engine: ') + e + '</div>';
+    }
+  }
+
+  /* Rows are built from strings rather than read off the page, so they are
+     rebuilt when the language changes. */
+  function renderProviders() {
+    const q = ($('#provSearch').value || '').toLowerCase().trim();
+    const list = $('#provList');
+    const rows = PROV.filter(p => !q || (p.name + ' ' + p.id).toLowerCase().includes(q));
+    if (!rows.length) { list.innerHTML = '<div class="note">' + I18n.t('No provider matches.') + '</div>'; return }
+    list.innerHTML = rows.map(p => {
+      const on = CONNECTED.includes(p.id);
+      return `<div class="prow">
+        <span class="nm" title="${p.id}">${p.name}</span>
+        <span class="pill ${on ? 'ok' : 'off'}">${I18n.t(on ? 'connected' : 'no key')}</span>
+        <input type="password" data-k="${p.id}" placeholder="${I18n.t('API key')}" autocomplete="off" spellcheck="false">
+        <button class="btn tiny primary" data-save="${p.id}">${I18n.t('Save')}</button>
+        <button class="btn tiny" data-clear="${p.id}">${I18n.t('Clear')}</button>
+      </div>`;
+    }).join('');
+  }
+
+  $('#provSearch').addEventListener('input', renderProviders);
+  $('#provList').addEventListener('click', async e => {
+    const save = e.target.dataset.save, clear = e.target.dataset.clear;
+    if (save) {
+      const inp = $(`input[data-k="${save}"]`), key = (inp.value || '').trim();
+      if (!key) return toast('Paste a key first.', 'err');
+      try { await invoke('oc_set_key', { provider: save, key }); inp.value = ''; toast(save + ' connected.', 'ok'); await refreshProviders() }
+      catch (e2) { toast('' + e2, 'err') }
+    }
+    if (clear) {
+      try { await invoke('oc_clear_key', { provider: clear }); toast(clear + ' key removed.', 'ok'); await refreshProviders() }
+      catch (e2) { toast('' + e2, 'err') }
+    }
+  });
+
+  /* ── the free-model picker ─────────────────────────── */
+  /* opencode reports a price for every model. Anything that costs nothing to
+     run is "free", and only those are offered — the picker never shows a model
+     that would need a paid key. A thousand of them across two hundred providers
+     is too many for a plain dropdown, so they're searched rather than listed. */
+  let FREE = [];                          // [{id, name, provider, label}]
+  const isFree = m => {
+    const c = m && m.cost;
+    return !!c && +c.input === 0 && +c.output === 0;
+  };
+
+  function collectFree(providers) {
+    const out = [];
+    for (const p of providers) {
+      const models = p.models || {};
+      for (const id of Object.keys(models)) {
+        const m = models[id];
+        if (!isFree(m)) continue;
+        out.push({ id: p.id + '/' + id, name: (m && m.name) || id, provider: p.name || p.id, pid: p.id });
+      }
+    }
+    /* the engine's own models first, then alphabetical by name */
+    out.sort((a, b) => (a.pid === 'opencode' ? -1 : b.pid === 'opencode' ? 1 : a.name.localeCompare(b.name)));
+    return out;
+  }
+
+  function renderModelList() {
+    const q = ($('#modelSearch').value || '').toLowerCase().trim();
+    const list = $('#modelList');
+    const rows = FREE.filter(m => !q || (m.name + ' ' + m.provider + ' ' + m.id).toLowerCase().includes(q));
+    if (!rows.length) {
+      list.innerHTML = '<div class="mempty">' + I18n.t(FREE.length ? 'No free model matches.' : 'No free models found. Start the engine and refresh.') + '</div>';
+      return;
+    }
+    let html = '', last = null;
+    for (const m of rows) {
+      if (m.pid !== last) { html += `<div class="mgrp">${m.provider}</div>`; last = m.pid; }
+      html += `<button type="button" class="mrow${S.model === m.id ? ' on' : ''}" data-mid="${m.id}">
+        <span class="mk"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.4 2.4 4.6-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span>${m.name}</span><span class="prov">${m.pid}</span></button>`;
+    }
+    list.innerHTML = html;
+  }
+
+  function paintModelBtn() {
+    const btn = $('#modelBtn .cur');
+    const cur = FREE.find(m => m.id === (S.model || ''));
+    if (cur) { btn.textContent = cur.name + ' · ' + cur.provider; btn.classList.remove('empty'); }
+    else if (S.model) { btn.textContent = S.model; btn.classList.remove('empty'); }
+    else { btn.textContent = I18n.t('Choose a free model…'); btn.classList.add('empty'); }
+  }
+
+  function fillModels(providers) {
+    FREE = collectFree(providers);
+    paintModelBtn();
+    renderModelList();
+  }
+
+  const mpick = $('#modelPick');
+  $('#modelBtn').addEventListener('click', () => {
+    mpick.classList.toggle('open');
+    if (mpick.classList.contains('open')) { $('#modelSearch').value = ''; renderModelList(); $('#modelSearch').focus() }
+  });
+  document.addEventListener('click', e => { if (!mpick.contains(e.target)) mpick.classList.remove('open') });
+  $('#modelSearch').addEventListener('input', renderModelList);
+  $('#modelList').addEventListener('click', async e => {
+    const row = e.target.closest('[data-mid]');
+    if (!row) return;
+    S.model = row.dataset.mid;
+    paintModelBtn(); renderModelList(); mpick.classList.remove('open'); flush();
+    try { await invoke('oc_set_model', { model: S.model }); toast('Model saved.', 'ok') } catch (e2) { toast('' + e2, 'err') }
+  });
+
+  let AGENTS = [];
+  function fillAgents(agents) {
+    const sel = $('#agent');
+    const list = Array.isArray(agents) ? agents.filter(a => a.mode !== 'subagent') : [];
+    AGENTS = list;
+    sel.innerHTML = '<option value="">' + I18n.t('Default') + '</option>'
+      + list.map(a => `<option value="${a.name}">${a.name} — ${a.mode || 'build'}</option>`).join('');
+    sel.value = S.agent || '';
+    paintAgentNote();
+  }
+
+  /* The row under the select says what the chosen agent actually is — its own
+     description plus how it treats permissions — and is rebuilt with the rest
+     when the language changes. Nothing is shown for "Default": the engine
+     decides there, and the static line above already says so. */
+  function paintAgentNote() {
+    const el = $('#agentNote');
+    if (!el) return;
+    const a = AGENTS.find(x => x.name === (S.agent || ''));
+    if (!a) { el.textContent = ''; return }
+    let out = a.description ? String(a.description) : '';
+    const perms = Array.isArray(a.permission) ? a.permission : [];
+    if (perms.length) {
+      const c = { allow: 0, ask: 0, deny: 0 };
+      perms.forEach(p => { if (c[p.action] !== undefined) c[p.action]++ });
+      const counts = `${I18n.t('allow')} ${c.allow} · ${I18n.t('ask')} ${c.ask} · ${I18n.t('deny')} ${c.deny}`;
+      out = out ? out + '\n' + counts : counts;
+    }
+    el.textContent = out;
+  }
+
+  /* agent changes need to reach the engine too */
+  $('#agent').addEventListener('change', async () => {
+    S.agent = $('#agent').value; flush(); paintAgentNote();
+    try { await invoke('oc_set_agent', { agent: S.agent }) } catch (e) { toast('' + e, 'err') }
+  });
+  $('#modelRefresh').addEventListener('click', () => { refreshProviders(); toast('Refreshed.') });
+
+  /* ── browse ─────────────────────────────────────────── */
+  const normPath = r => {
+    if (!r) return null;
+    if (typeof r === 'string') return r;
+    if (Array.isArray(r)) return normPath(r[0]);
+    return r.path || null;
+  };
+  async function pick(kind) {
+    if (!openDialog) return toast('File picker unavailable.', 'err');
+    let res = null;
+    try {
+      res = await openDialog(kind === 'file'
+        ? { multiple: false, filters: [{ name: 'Executable', extensions: ['exe'] }] }
+        : { directory: true });
+    } catch (e) { return toast('' + e, 'err') }
+    const path = normPath(res);
+    if (!path) return;
+    const id = kind === 'file' ? 'runtime_path' : 'workspace';
+    S[id] = path;
+    paint($('#' + id));
+    flush();
+    toast('Saved.', 'ok');
+  }
+  $('#runtimeBrowse').addEventListener('click', () => pick('file'));
+  $('#wsBrowse').addEventListener('click', () => pick('dir'));
+
+  /* ── folder / reset ─────────────────────────────────── */
+  $$('[data-open]').forEach(b => b.addEventListener('click', async () => {
+    try { await invoke('open_path', { which: b.dataset.open }) } catch (e) { toast('' + e, 'err') }
+  }));
+  $('#resetAll').addEventListener('click', async () => {
+    try {
+      const def = await invoke('settings_reset');
+      S = def; paintAll();
+      await invoke('oc_set_model', { model: S.model }).catch(() => {});
+      await invoke('oc_set_agent', { agent: S.agent }).catch(() => {});
+      toast('Everything is back to default.', 'ok');
+    } catch (e) { toast('' + e, 'err') }
+  });
+
+  /* ── boot ───────────────────────────────────────────── */
+  (async () => {
+    try { S = await invoke('settings_get') } catch (e) { toast('' + e, 'err'); S = {} }
+    paintAll();
+    /* The theme and the language are painted here as well as by the shared
+       boot module, so this window never shows its defaults first. */
+    Theme.apply(S.theme, S.mode);
+    paintAppearance();
+    I18n.set(S.language);
+    status();
+    refreshProviders();
+    /* The update card paints itself from what Rust reports, then asks for a
+       fresh check in the background — so "Latest version" is filled in by the
+       time you look at it without anything having blocked on GitHub. */
+    updPaint().then(() => invoke('oc_update_check').then(u => { if (u) { UPD = u; paintUpdate() } }).catch(() => {}));
+    setInterval(status, 4000);
+  })();
+
+  /* ── language ───────────────────────────────────────── */
+  /* Changing it repaints this window straight away and is saved with the rest,
+     so the island picks it up from the same file. */
+  $('#language').addEventListener('change', () => {
+    S.language = $('#language').value;
+    I18n.set(S.language);
+    paintHeading();                 // the heading is rewritten, not walked
+    engineView(lastStatus);         // and so are the engine's own labels
+    paintUpdate();                  // ditto the update card's dynamic half
+    paintAgentNote();               // and the agent description
+    /* The provider rows, the notes and the model button are built from
+       strings in JS rather than read off the page, so the whole list is
+       rebuilt — otherwise only the static half of the window would switch
+       language. */
+    refreshProviders();
+    flush();
+  });
+
+  /* Repaint the gallery when the theme is changed from anywhere else. */
+  window.addEventListener('nn:settings', e => {
+    const s = (e && e.detail) || {};
+    if (s.theme !== undefined || s.mode !== undefined) { Object.assign(S, { theme: s.theme, mode: s.mode }); paintAppearance() }
+  });
+})();
+</script>
+</body>
+</html>
