@@ -224,6 +224,7 @@ const fr = {
   'Thinking…': 'Réflexion…',
   'Answering…': 'Réponse…',
   'Stopped.': 'Arrêté.',
+  'Still queued — free models can take a minute': 'Encore en file d’attente — les modèles gratuits peuvent être lents',
   'Searching': 'Recherche',
   'Reading file': 'Lecture du fichier',
   'Running code': 'Exécution du code',
@@ -319,6 +320,40 @@ const fr = {
   'The look of the island and of Settings. Pick one and both change together.':
     'L’apparence de l’îlot et des Réglages. Choisissez-en un, les deux changent ensemble.',
   'Browse…': 'Parcourir…',
+
+  /* agent hub — the prototype's own vocabulary */
+  'sees screen': 'voit l’écran',
+  'Agent Hub': 'Hub des agents',
+  'Undo': 'Annuler',
+  'Undone': 'Annulé',
+  'wants to:': 'veut :',
+  'Screen': 'Écran',
+  'Clipboard': 'Presse-papiers',
+  'Run': 'Lancer',
+  'Again': 'Encore',
+  'Nothing yet.': 'Rien pour l’instant.',
+  'is open': 'est ouvert',
+  'Task: ': 'Tâche : ',
+  'Allowed automatically': 'Approuvé automatiquement',
+  'Blocked automatically': 'Blocké automatiquement',
+  'Could not take a screenshot.': 'Impossible de prendre une capture d’écran.',
+  'Could not read the clipboard.': 'Impossible de lire le presse-papiers.',
+  'Voice input is not available here — type instead.':
+    'La saisie vocale n’est pas disponible ici — écrivez plutôt.',
+  'App permissions': 'Autorisations des applications',
+  'Clear always-allow rules': 'Effacer les règles d’approbation auto',
+  'No routines yet. Add one below — they run through the engine.':
+    'Aucune routine pour l’instant. Ajoutez-en une ci-dessous — elles passent par le moteur.',
+  'New routine…': 'Nouvelle routine…',
+  'Recent tasks': 'Tâches récentes',
+  'Waiting for approval': 'En attente d’approbation',
+  'Completed': 'Terminé',
+  'Running…': 'Exécution…',
+  'Windows': 'Fenêtres',
+  'Every day': 'Chaque jour',
+  'Terminal': 'Terminal',
+  'Files': 'Fichiers',
+  'Browser': 'Navigateur',
 };
 
 const ar = {
@@ -508,6 +543,7 @@ const ar = {
   'Thinking…': 'يفكّر…',
   'Answering…': 'يجيب…',
   'Stopped.': 'تم الإيقاف.',
+  'Still queued — free models can take a minute': 'ما زال في الانتظار — النماذج المجانية قد تكون بطيئة',
   'Searching': 'يبحث',
   'Reading file': 'يقرأ ملفًا',
   'Running code': 'يشغّل كودًا',
@@ -603,6 +639,39 @@ const ar = {
   'The look of the island and of Settings. Pick one and both change together.':
     'مظهر الجزيرة والإعدادات. اختر أحدهما يتغيّر الاثنان معًا.',
   'Browse…': 'تصفّح…',
+
+  /* agent hub — the prototype's own vocabulary */
+  'sees screen': 'يرى الشاشة',
+  'Agent Hub': 'مركز الوكلاء',
+  'Undo': 'تراجع',
+  'Undone': 'تم التراجع',
+  'wants to:': 'يريد:',
+  'Screen': 'الشاشة',
+  'Clipboard': 'الحافظة',
+  'Run': 'تشغيل',
+  'Again': 'إعادة',
+  'Nothing yet.': 'لا شيء بعد.',
+  'is open': 'مفتوح',
+  'Task: ': 'مهمة: ',
+  'Allowed automatically': 'مسموح تلقائيًا',
+  'Blocked automatically': 'محظور تلقائيًا',
+  'Could not take a screenshot.': 'تعذّر التقاط لقطة شاشة.',
+  'Could not read the clipboard.': 'تعذّرت قراءة الحافظة.',
+  'Voice input is not available here — type instead.': 'الإدخال الصوتي غير متاح هنا — اكتب بدلاً من ذلك.',
+  'App permissions': 'أذونات التطبيقات',
+  'Clear always-allow rules': 'مسح قواعد الموافقة التلقائية',
+  'No routines yet. Add one below — they run through the engine.':
+    'لا روتينات بعد. أضف واحدة أدناه — تعمل من خلال المحرّك.',
+  'New routine…': 'روتين جديد…',
+  'Recent tasks': 'المهام الأخيرة',
+  'Waiting for approval': 'بانتظار الموافقة',
+  'Completed': 'مكتمل',
+  'Running…': 'جارٍ التشغيل…',
+  'Windows': 'النوافذ',
+  'Every day': 'كل يوم',
+  'Terminal': 'الطرفية',
+  'Files': 'الملفات',
+  'Browser': 'المتصفح',
 };
 
 const DICT = { en: {}, fr, ar };

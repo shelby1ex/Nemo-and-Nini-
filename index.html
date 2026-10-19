@@ -644,6 +644,20 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--focus);outline-
 .msg .acts button{border:0;background:rgba(255,255,255,.07);color:#9AA0B4;font-size:10.5px;
   border-radius:7px;padding:3px 8px;cursor:pointer}
 .msg .acts button:hover{background:rgba(255,255,255,.14);color:#E7EAF0}
+/* the work trail — one row per engine step, running → done, kept with the
+   answer it belongs to */
+.tlive{display:flex;flex-direction:column;gap:3px;margin:1px 0 5px 4px}
+.ttrail{display:flex;flex-direction:column;gap:3px;margin:2px 0 6px 4px}
+.trow{display:flex;align-items:center;gap:6px;font-size:11px;color:#8A90A6;line-height:1.35;min-width:0;animation:msgIn .16s ease-out}
+.trow .tic{font-style:normal;width:15px;height:15px;border-radius:5px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c);display:grid;place-items:center;font-size:10px;flex:none}
+.trow .tlab{font-weight:640;color:#C8CEDA;letter-spacing:.02em;flex:none}
+.trow .tdet{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1;opacity:.8;font-family:ui-monospace,Consolas,monospace;font-size:10.5px}
+.trow .tok,.trow .terr{font-style:normal;font-size:10px;flex:none;font-weight:700}
+.trow .tok{color:#2ecc71}.trow .terr{color:#ff5a5f}
+.trow .tdot{width:6px;height:6px;border-radius:50%;background:var(--c,#5b9bff);flex:none;animation:tpulse 1s infinite}
+.trow.s-ok,.trow.s-no{opacity:.6}
+@keyframes tpulse{0%,100%{opacity:.25}50%{opacity:1}}
+.d2-send.stop{background:#E5484D;box-shadow:0 6px 14px -6px rgba(229,72,77,.9)}
 .d2-drop{flex:1;min-height:0;border:1.5px dashed rgba(255,255,255,.16);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;background:rgba(255,255,255,.02)}
 .d2-drop.over{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.07)}
 /* Legacy sub-views: no room reserved for live blobs anymore (they stay on desktop) */
@@ -1043,7 +1057,7 @@ html,body{background:transparent!important;overflow:hidden!important}
 .stage{position:fixed!important;left:0!important;top:0!important;width:100vw!important;height:100vh!important;transform:none!important}
 .pc{position:absolute!important;inset:0!important;padding:0!important;background:transparent!important;border-radius:0!important;box-shadow:none!important}
 .screen{background:transparent!important;border-radius:0!important}
-.wall,.deskicons,.flyout,#ax,#axCur,.controls,.mobile-hint{display:none!important}
+.wall,.deskicons,.flyout,.controls,.mobile-hint{display:none!important}
 .taskbar{visibility:hidden!important}
 .win{display:none!important}
 .win.real{display:flex!important;visibility:hidden!important}
@@ -1695,7 +1709,7 @@ Nemo says: drop the PDF on the island and let him read it.</textarea>
           <button class="tab on" data-go="overview" aria-label="Overview"><svg viewBox="0 0 16 16"><path d="M2.5 7.2L8 2.5l5.5 4.7V13a.8.8 0 01-.8.8H10V10H6v3.8H3.3a.8.8 0 01-.8-.8z" fill="currentColor"/></svg></button>
           <button class="tab" data-go="prompt" aria-label="Ask"><svg viewBox="0 0 16 16"><path d="M3 2.5h10a1.5 1.5 0 011.5 1.5v6a1.5 1.5 0 01-1.5 1.5H7l-3.5 3v-3H3A1.5 1.5 0 011.5 10V4A1.5 1.5 0 013 2.5z" fill="currentColor"/></svg></button>
         </div>
-        <div class="r"><span id="hdrCount"></span><button class="snd" id="hdrSnd" aria-label="Sound"><svg viewBox="0 0 16 16"><path d="M2 6h2.5L8 3v10L4.5 10H2z" fill="currentColor"/><path class="w" d="M10.5 5.5a3.5 3.5 0 010 5M12.3 3.8a6 6 0 010 8.4" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></button></div>
+        <div class="r"><span id="hdrCount"></span><button class="snd" id="hdrHub" aria-label="Agent Hub" title="Agent Hub"><svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="6" fill="#2F6BFF"/><circle cx="6" cy="7" r="1.1" fill="#fff"/><circle cx="10" cy="7" r="1.1" fill="#fff"/><path d="M5.7 10c1.3 1 3.3 1 4.6 0" stroke="#fff" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg></button><button class="snd" id="hdrSnd" aria-label="Sound"><svg viewBox="0 0 16 16"><path d="M2 6h2.5L8 3v10L4.5 10H2z" fill="currentColor"/><path class="w" d="M10.5 5.5a3.5 3.5 0 010 5M12.3 3.8a6 6 0 010 8.4" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></button></div>
       </div>
 
       <div class="view d2" data-view="overview">
@@ -1703,6 +1717,7 @@ Nemo says: drop the PDF on the island and let him read it.</textarea>
           <aside class="d2-side">
             <button class="d2-ic on" data-go="overview" aria-label="Companions" title="Companions"><svg viewBox="0 0 16 16"><path d="M2.5 7.2L8 2.5l5.5 4.7V13a.8.8 0 01-.8.8H10V10H6v3.8H3.3a.8.8 0 01-.8-.8z" fill="currentColor"/></svg></button>
             <button class="d2-ic" data-go="prompt" aria-label="Ask" title="Ask"><svg viewBox="0 0 16 16"><path d="M3 2.5h10a1.5 1.5 0 011.5 1.5v6a1.5 1.5 0 01-1.5 1.5H7l-3.5 3v-3H3A1.5 1.5 0 011.5 10V4A1.5 1.5 0 013 2.5z" fill="currentColor"/></svg></button>
+            <button class="d2-ic" id="d2Hub" aria-label="Agent Hub" title="Agent Hub"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="#2F6BFF"/><circle cx="6" cy="7" r="1.1" fill="#fff"/><circle cx="10" cy="7" r="1.1" fill="#fff"/><path d="M5.7 10c1.3 1 3.3 1 4.6 0" stroke="#fff" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg></button>
             <div class="d2-sp"></div>
             <button class="d2-ic" id="d2Settings" aria-label="Settings" title="Settings"><svg viewBox="0 0 16 16"><path d="M8 5.4a2.6 2.6 0 100 5.2 2.6 2.6 0 000-5.2zM14.5 8c0-.4 0-.8-.06-1.1l1-1.05-.94-1.63-1.4.5c-.3-.24-.64-.44-1-.6L11.8 2.5H9.2l-.3 1.62c-.36.16-.7.36-1 .6l-1.4-.5-.94 1.63 1 1.05C6.5 7.2 6.5 7.6 6.5 8s0 .8.06 1.1l-1 1.05.94 1.63 1.4-.5c.3.24.64.44 1 .6l.3 1.62h2.6l.3-1.62c.36-.16.7-.36 1-.6l1.4.5.94-1.63-1-1.05c.06-.3.06-.7.06-1.1z" fill="currentColor"/></svg></button>
           </aside>
@@ -1979,6 +1994,9 @@ const STATES={
 const EMOTES={love:{label:'Love',eye:'heart',snd:'love',c:'#FF4D6D'},surprised:{label:'Surprised',eye:'dot',snd:'pop',c:'#FFFFFF'},proud:{label:'Proud',eye:'star',snd:'proud',c:'#F7B32B'},wink:{label:"Wink",eye:'wink',snd:'wink',c:'#A78BFA'},yawn:{label:'Yawn',eye:'tired',snd:'yawn',c:'#94A3B8'},
   happy:{label:'Happy',eye:'happy',snd:'love',c:'#34D399'},
   annoyed:{label:'Annoyed',eye:'line',snd:'annoyed',c:'#A855F7'}};
+/* Le vocabulaire des yeux pendant la parole — repris des emotes du prototype,
+   penché vers le sourire, avec des accents (clin d'œil, étoile, cœur rare). */
+const TALK_EYES=['happy','wide','happy','wink','happy','dot','happy','star','happy','wide','happy','heart'];
 
 function rr(x,X,Y,W,H,R){R=Math.max(0,Math.min(R,W/2,H/2));x.beginPath();x.moveTo(X+R,Y);x.arcTo(X+W,Y,X+W,Y+H,R);x.arcTo(X+W,Y+H,X,Y+H,R);x.arcTo(X,Y+H,X,Y,R);x.arcTo(X,Y,X+W,Y,R);x.closePath()}
 function heart(x,s){x.beginPath();x.moveTo(0,s*.38);x.bezierCurveTo(-s*1.05,-s*.15,-s*.5,-s*.95,0,-s*.38);x.bezierCurveTo(s*.5,-s*.95,s*1.05,-s*.15,0,s*.38);x.closePath()}
@@ -1993,7 +2011,7 @@ class Bot{
     this.tg={...this.s}; this.tw=[]; this.lock={};
     this.col=[230,233,238]; this.colT=[230,233,238];
     this.state='idle'; this.cfg=STATES.idle; this.eyeOv=null; this.ovUntil=0; this.badge=null; this.badgeCol='#fff'; this._bk='none'; this._bt=0;
-    this.parts=[]; this.nextBlink=NOW()+1500+Math.random()*2000; this.look={x:0,y:0}; this.t0=NOW()-Math.random()*5000; this.waveUntil=0; this.lastAmb=0; this.last=NOW(); this.legLen=1;
+    this.parts=[]; this.nextBlink=NOW()+1500+Math.random()*2000; this.look={x:0,y:0}; this.t0=NOW()-Math.random()*5000; this.waveUntil=0; this.lastAmb=0; this.last=NOW(); this.legLen=1; this.talkUntil=0; this.talkNext=0; this.talkIdx=0;
     /* Le papillon de Nini vit ici : posé sur la tête, il vole un peu, il redescend.
        `next` est l'instant de la prochaine étape — sans lui il décide à chaque frame
        et reste planté en l'air. */
@@ -2021,6 +2039,9 @@ class Bot{
   setBadge(b){ const key=b?b.join():'none'; if(key===this._bk)return; this._bk=key; const tok=++this._bt;
     this.anim('badgeS',[[0,90,E.inOut]]); setTimeout(()=>{ if(tok!==this._bt)return; this.badge=b?b[0]:null; this.badgeCol=b?b[1]:null; if(b) this.anim('badgeS',[[1,280,E.back]]) },100) }
   blink(){ if(this.lock.open)return; this.anim('open',[[.06,70,E.inOut],[1,130,E.out]]) }
+  /* La parole : pas de bouche — les yeux seuls racontent la phrase. Chaque
+     appel prolonge la réplique en cours (voir talkEyes dans update). */
+  talk(ms=700){ this.talkUntil=Math.max(this.talkUntil,NOW()+ms) }
   squash(){ this.anim('sy',[[.78,70,E.out],[1.1,130,E.out],[1,170,E.inOut]]); this.anim('sx',[[1.16,70,E.out],[.95,130,E.out],[1,170,E.inOut]]) }
   roll(d=900,turns=1){ this.s.roll=0; this.anim('roll',[[Math.PI*2*turns,d,E.inOut]],()=>{this.s.roll=0;this.tg.roll=0}) }
   greet(){ this.anim('hands',[[1,280,E.back]]); this.waveUntil=NOW()+1500; this.emote('happy',1500,true); setTimeout(()=>this.anim('hands',[[0,240,E.inOut]]),1550) }
@@ -2050,6 +2071,12 @@ class Bot{
     this.col=mix(this.col,this.colT,1-Math.pow(.002,dt));
     if(n>this.nextBlink){ if(this.state!=='sleeping'&&this.state!=='dizzy'){ this.blink(); if(Math.random()<.22) setTimeout(()=>this.blink(),230) } this.nextBlink=n+2200+Math.random()*3200 }
     if(this.eyeOv&&n>this.ovUntil) this.eyeOv=null;
+    /* Parole : les yeux seuls racontent la phrase — une expression toutes
+       les ~700 ms, jamais par-dessus un emote() posé par ailleurs. */
+    if(n<this.talkUntil&&this.state!=='sleeping'&&n>this.talkNext){
+      this.talkNext=n+480+Math.random()*420;
+      if(!this.eyeOv||this.ovUntil<=n){ this.eyeOv=TALK_EYES[(this.talkIdx++)%TALK_EYES.length]; this.ovUntil=n+340+Math.random()*180 }
+    }
     if(this.P.butterfly&&!this.noBf) this.bfUpdate(dt,n);
     if(!this.mini&&n-this.lastAmb>1300){ this.lastAmb=n; if((c.zz||s.asleep>.5)&&!this.lock.zz) this.emit('z',1); if(c.sweat&&Math.random()<.5) this.emit('sweat',1) }
     for(const p of this.parts) p.age+=dt; this.parts=this.parts.filter(p=>p.age<p.life);
@@ -2312,6 +2339,7 @@ const app={piste:'nemo',mode:'hidden',view:'overview',tasks:[],focus:null,presen
 
 const screen=$('#screen'), island=$('#island'), botwrap=$('#botwrap'), safari=$('#safari');
 const main=new Bot($('#botc')); const floatB=new Bot($('#floatc'));
+const BOTS=[main,floatB];   /* tous les yeux qui peuvent parler à l'écran */
 const agentEls={}, minis={};
 
 /* ---------------- LAYOUT ---------------- */
@@ -2482,7 +2510,7 @@ function submitPrompt(){ const v=$('#promptIn').value.trim(); if(!v) return;
    at the bottom, and nothing ever wiped: each answer appends and the ones
    before it stay put. The history itself lives in the engine's own session,
    so coming back tomorrow simply means re-reading the messages it already has. */
-const CHAT = { log: [], live: null, err: false, booted: false };
+const CHAT = { log: [], live: null, err: false, booted: false, trail: [], tv: 0 };
 
 const esc = s => String(s==null?'':s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 /* One translator in reach of every JS-owned string on this page: the markup
@@ -2525,6 +2553,55 @@ function actDetail(part){
   }catch(e){}
   return '';
 }
+
+/* ── the work trail: which tools ran, right in the thread ────────────────
+   The same short vocabulary the reference gateway shows for engine
+   activity — Shell, Edit, WebFetch, Search, Read, Task, and a single
+   "Thinking" while it reasons. One row per engine tool part, keyed by the
+   part's own id, updated in place as its state moves running → done, and
+   kept in the message when the answer lands. Raw reasoning is never shown. */
+const TRAIL = {
+  think:{ ic:'◌', c:'#8B5CF6', k:'Thinking' }, shell:{ ic:'❯', c:'#ff5a5f', k:'Shell' },
+  edit:{ ic:'✎', c:'#f5a623', k:'Edit' },  fetch:{ ic:'↗', c:'#5b9bff', k:'WebFetch' },
+  search:{ ic:'⌕', c:'#9cc2ff', k:'Search' }, read:{ ic:'◫', c:'#2ecc71', k:'Read' },
+  task:{ ic:'⚡', c:'#9cc2ff', k:'Task' }, tool:{ ic:'⚙', c:'#9aa0aa', k:'Tool' },
+};
+function trailKind(tool){
+  const n=String(tool||'').toLowerCase();
+  if(n==='bash'||n==='shell') return 'shell';
+  if(n==='edit'||n==='write'||n==='patch'||n==='apply_patch') return 'edit';
+  if(n==='webfetch') return 'fetch';
+  if(n==='websearch'||n==='grep'||n==='glob') return 'search';
+  if(n==='read'||n==='list') return 'read';
+  if(n==='task'||n==='todowrite'||n==='todoread') return 'task';
+  return 'tool';
+}
+function trailUp(row){
+  const i=CHAT.trail.findIndex(r=>r.id===row.id);
+  if(i>=0) CHAT.trail[i]=Object.assign(CHAT.trail[i],row); else CHAT.trail.push(row);
+  CHAT.tv++; chatLiveNode();
+}
+/* the one "Thinking" row — opens on reasoning, closes on first real work */
+function trailThink(){
+  if(!CHAT.trail.some(r=>r.id==='__think')) trailUp({ id:'__think', kind:'think', detail:'', s:'run' });
+}
+function trailWork(){
+  const r=CHAT.trail.find(r=>r.id==='__think');
+  if(r&&r.s==='run'){ r.s='ok'; CHAT.tv++; }
+}
+/* a row still marked running when the answer lands (or when you interrupt)
+   is frozen to done — a spinner that never stops would be a lie */
+function trailFreeze(){ CHAT.trail=CHAT.trail.map(r=>r.s==='run'?Object.assign({},r,{s:'ok'}):r) }
+function trailHTML(rows){
+  if(!rows||!rows.length) return '';
+  return '<div class="ttrail">'+rows.map(r=>{
+    const t=TRAIL[r.kind]||TRAIL.tool;
+    const dot=r.s==='run'?'<i class="tdot"></i>':r.s==='ok'?'<b class="tok">✓</b>':'<b class="terr">✗</b>';
+    return '<div class="trow s-'+(r.s||'run')+'"><i class="tic" style="--c:'+t.c+'">'+t.ic+'</i>'
+      +'<span class="tlab">'+LT(t.k)+'</span>'
+      +(r.detail?'<span class="tdet">'+esc(r.detail)+'</span>':'')+dot+'</div>';
+  }).join('')+'</div>';
+}
 let SUB = { key: 'Ask anything', extra: '' };
 function paintSub(){
   const e = $('#promptSub'); if(!e) return;
@@ -2537,9 +2614,22 @@ function chatSub(key, extra){
 }
 /* The island owns its labels, so the language change has to come back here:
    the markup walk deliberately never touches this page. */
-window.addEventListener('nn:lang', () => { try{ paintSub() }catch(e){} });
+window.addEventListener('nn:lang', () => { try{ paintSub(); chatThread() }catch(e){} });
 
-function chatBusyUI(on){ const e=$('#chatState'); if(e) e.style.opacity = on?'0.35':'' }
+function chatBusyUI(on){
+  const e=$('#chatState'); if(e) e.style.opacity = on?'0.35':'';
+  /* the send button becomes the interrupt while the engine works — same
+     spot, same size, unmistakably red */
+  const b=document.querySelector('[data-act=send]');
+  if(b){
+    b.classList.toggle('stop',!!on);
+    b.title = on ? LT('Stop') : 'Send';
+    b.setAttribute('aria-label', b.title);
+    b.innerHTML = on
+      ? '<svg viewBox="0 0 16 16"><rect x="4.4" y="4.4" width="7.2" height="7.2" rx="1.6" fill="currentColor"/></svg>'
+      : '<svg viewBox="0 0 16 16"><path d="M14 2L7.5 8.5M14 2L9.5 14l-2-5.5L2 6.5z" fill="currentColor"/></svg>';
+  }
+}
 function chatNear(){ const l=chatEl(); return !l || (l.scrollHeight-l.scrollTop-l.clientHeight)<60 }
 function chatDown(){ const l=chatEl(); if(l) l.scrollTop=l.scrollHeight }
 
@@ -2547,7 +2637,8 @@ function chatBubbleNode(m){
   return m.role==='user'
     ? '<div class="msg me"><div class="bub">'+esc(m.text)+'</div></div>'
     : '<div class="msg them'+(m.err?' err':'')+'"><div class="from">Nemo &amp; Nini</div>'
-      + '<div class="bub">'+esc(m.text)+'</div></div>';
+      + trailHTML(m.trail)
+      + (m.text ? '<div class="bub">'+esc(m.text)+'</div>' : '')+'</div>';
 }
 
 /* repaint the thread from the log — it is only text, so this stays cheap */
@@ -2569,9 +2660,16 @@ function chatLiveNode(){
   if(!w){
     w=document.createElement('div');
     w.className='msg them'; w.setAttribute('data-live','');
-    w.innerHTML='<div class="from">Nemo &amp; Nini</div><div class="bub"></div>';
+    w.innerHTML='<div class="from">Nemo &amp; Nini</div><div class="tlive"></div><div class="bub"></div>';
     l.querySelectorAll('.chat-empty').forEach(e=>e.remove());
     l.appendChild(w);
+    w.dataset.tv='-1';
+  }
+  /* the trail only repaints when a tool row actually changed — the typing
+     dots below never flicker because of it */
+  if(w.dataset.tv!==String(CHAT.tv)){
+    w.dataset.tv=String(CHAT.tv);
+    const t=w.querySelector('.tlive'); if(t) t.innerHTML=trailHTML(CHAT.trail);
   }
   const b=w.querySelector('.bub');
   b.innerHTML = (CHAT.live===''||CHAT.live===null)
@@ -2581,31 +2679,60 @@ function chatLiveNode(){
   return w;
 }
 
-function chatAdd(role, text, err){
-  CHAT.log.push({ role, text:text||'', err:!!err });
+function chatAdd(role, text, err, trail){
+  const m = { role, text:text||'', err:!!err };
+  if(trail&&trail.length) m.trail=trail;
+  CHAT.log.push(m);
   chatThread();
 }
 function chatBegin(){
-  CHAT.live=''; CHAT.err=false;
+  CHAT.live=''; CHAT.err=false; CHAT.t0=NOW(); CHAT.trail=[]; CHAT.tv++;
   chatSub('Thinking…'); chatBusyUI(true);
+  talkBeatStart(); main.setState('thinking',true);
   const stick=chatNear(); chatLiveNode(); if(stick) chatDown();
 }
+/* Toute la parole passe par là : pendant que le texte arrive, les yeux de
+   chacun changent d'expression — et se posent doucement sur un happy à la fin. */
+function talkAll(ms){ BOTS.forEach(b=>{ if(b) b.talk(ms) }) }
+/* Le battement de la conversation : dès l'envoi jusqu'à la fin, les yeux
+   vivent — même pendant que le moteur réfléchit. Et le sous-titre affiche
+   les secondes passées : l'attente se voit, elle ne se subit pas. */
+let talkBeat=null;
+function talkBeatStep(){
+  talkAll(900);
+  /* after 20s with no first word it is almost always the free tier's queue —
+     say so, instead of letting the silence look like a hang */
+  if(!CHAT.live&&(SUB.key==='Thinking…'||SUB.key==='Still queued — free models can take a minute')){
+    const s=Math.round((NOW()-CHAT.t0)/1000);
+    if(s>2) chatSub(s>20?'Still queued — free models can take a minute':'Thinking…', s+'s');
+  }
+}
+function talkBeatStart(){ if(talkBeat) return; talkAll(900); talkBeat=setInterval(talkBeatStep,700) }
+function talkBeatStop(){ if(talkBeat){ clearInterval(talkBeat); talkBeat=null } }
 function chatChunk(t){
   CHAT.live=t; if(CHAT.live) chatSub('Answering…');
+  talkAll(650);
   const stick=chatNear(); chatLiveNode(); if(stick) chatDown();
 }
 function chatFinish(text, err){
   CHAT.live=null; CHAT.err=false;
+  talkBeatStop();
   const l=chatEl(); const w=l&&l.querySelector('[data-live]'); if(w) w.remove();
-  chatAdd('assistant', text || 'The engine finished without saying anything.', err);
+  trailFreeze();
+  const tr=CHAT.trail.slice(); CHAT.trail=[]; CHAT.tv++;
+  chatAdd('assistant', text || 'The engine finished without saying anything.', err, tr);
+  talkAll(260);
+  main.emote('happy',1300,true); if(nemo) nemo.emote('happy',1300,true);
+  main.setState(err?'error':'finished',true);
   chatSub('Ask anything'); chatBusyUI(false);
 }
 function chatReset(){
-  CHAT.live=null; CHAT.err=false; CHAT.log=[];
+  CHAT.live=null; CHAT.err=false; CHAT.log=[]; CHAT.trail=[]; CHAT.tv++;
+  talkBeatStop(); main.setState('idle',true);
   chatThread(); chatSub('Ask anything'); chatBusyUI(false);
 }
 
-function note(a,b,ms=2000){ $$('[data-f=note]').forEach(e=>e.textContent=a); $$('[data-f=note2]').forEach(e=>e.textContent=b||''); expand('note'); app.pinned=true; setTimeout(()=>{ if(app.view==='note'&&!app.demoHold) collapse() },ms) }
+function note(a,b,ms=2000){ talkAll(clamp(900+a.length*42,900,4200)); $$('[data-f=note]').forEach(e=>e.textContent=a); $$('[data-f=note2]').forEach(e=>e.textContent=b||''); expand('note'); app.pinned=true; setTimeout(()=>{ if(app.view==='note'&&!app.demoHold) collapse() },ms) }
 
 island.addEventListener('click',e=>{ const b=e.target.closest('[data-act],[data-go]'); if(!b)return; e.stopPropagation(); app.lastAct=NOW(); act(b.dataset.act||('go-'+b.dataset.go),b) });
 function act(a,b){
@@ -2624,14 +2751,18 @@ function act(a,b){
     case 'file-ask': app.ctx={type:'file',label:app.file}; renderChips(); expand('prompt'); if(!app.demo) setTimeout(()=>$('#promptIn').focus(),300); break;
     case 'mail': expand('mail'); if(!app.demo) setTimeout(()=>$('#mailTo').focus(),300); break;
     case 'send-mail': { const to=$('#mailTo').value.trim()||'name@example.com'; Snd.play('send'); main.emote('wink',900); note(`Mail sent to ${to}.`,`${app.file} went along as an attachment.`,2200); break }
-    case 'send': submitPrompt(); break;
+    case 'send': if(ENGINE.busy||CHAT.live!==null) AIBridge.stop(); else submitPrompt(); break;
     case 'open-first': Snd.play('blip'); collapse(); break;
     case 'copy': Snd.play('blip'); note('Copied.','',1200); break;
     case 'close': collapse(); break;
   }
   if(b){ b.classList.add('pressed'); setTimeout(()=>b.classList.remove('pressed'),160) }
 }
-$('#promptIn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); submitPrompt() } });
+$('#promptIn').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){ e.preventDefault(); submitPrompt(); return }
+  /* Esc interrupts the answer without leaving the chat */
+  if(e.key==='Escape'&&ENGINE.busy){ e.preventDefault(); AIBridge.stop() }
+});
 window.addEventListener('keydown',e=>{ if(app.demo||isTyping(e))return;
   if(app.view==='approval'&&app.mode==='expanded'){ if(e.key==='y'||e.key==='Y') act('allow',$('[data-act=allow]')); if(e.key==='n'||e.key==='N') act('deny',$('[data-act=deny]')) }
   if(e.key==='Escape'&&app.mode==='expanded') collapse() });
@@ -2657,7 +2788,7 @@ $('#hdrSnd').addEventListener('click',e=>{ e.stopPropagation(); setSound(!Snd.on
    décide de la posture, NEMO (l'état + l'intention) décide de la position. Ils se lisent
    l'un l'autre mais ne s'écrivent pas : le controller ne touche jamais à MOOD.v, il
    appelle MOOD.hurt() / MOOD.pet(), et MOOD ne bouge jamais NEMO. */
-const nemoEl=$('#nemo'), nemo=new Bot($('#nemoC'),{size:92,ah:1.6,piste:'nemo'});
+const nemoEl=$('#nemo'), nemo=new Bot($('#nemoC'),{size:92,ah:1.6,piste:'nemo'}); BOTS.push(nemo);
 /* Pas de bulle de texte : les mots à l'écran détournent l'œil du personnage.
    Tout passe par le son — chaque geste a le sien (voir charAct et les déclencheurs). */
 const NEMO={mode:'inside',x:screen.clientWidth/2,y:630,vx:0,vy:0,jy:0,face:1,sc:1,gait:0,home:false,shown:false,
@@ -3145,7 +3276,7 @@ const BU_FOOT=88*.3*(.88*.82+.27+.13*.62+.06);      // centre → plante, boîte
 const buddy={ on:false,id:null,bot:null,M:null,parked:false };
 function buddyStart(id){
   if(buddy.on||!id) return;
-  buddy.id=id; buddy.bot=new Bot($('#buddyC'),{size:88,ah:1.6,piste:id});
+  buddy.id=id; buddy.bot=new Bot($('#buddyC'),{size:88,ah:1.6,piste:id}); BOTS.push(buddy.bot);
   buddy.M={ x:screen.clientWidth/2+(Math.random()<.5?-1:1)*(170+Math.random()*130), y:nmBottom(), vx:0, vy:0, face:1,
     gx0:70, gx1:1026,
     gait:0, walkS:0, mode:'drop', t:NOW(), t0:NOW(), idleT:0, asleep:false, why:'none', goalX:screen.clientWidth/2,
@@ -4142,9 +4273,17 @@ const AIBridge = {
   },
 
   abort(){
+    /* interrupting never erases the trace: whatever had already streamed,
+       and whatever the engine had managed to do, lands in the thread as
+       it stood at the moment you stopped it */
+    const partial=CHAT.live;
+    trailFreeze();
+    const tr=CHAT.trail.slice();
     ENGINE.busy=false;
-    CHAT.live=null; CHAT.err=false;
+    CHAT.live=null; CHAT.err=false; CHAT.trail=[]; CHAT.tv++;
+    talkBeatStop();
     const l=chatEl(); const w=l&&l.querySelector('[data-live]'); if(w) w.remove();
+    if(partial||tr.length) chatAdd('assistant', partial||'', false, tr);
     if(ENGINE.session) TAU.core.invoke('oc_abort',{session:ENGINE.session}).catch(()=>{});
     chatSub('Ask anything'); chatBusyUI(false);
   },
@@ -4243,9 +4382,15 @@ const AIBridge = {
            build" rather than the raw tool name */
         const key=ACT_KEY[actType(part.tool)]||ACT_KEY.working;
         chatSub(key, actDetail(part));
+        /* and the same step, kept live in the thread as a work trail */
+        const s=(part.state||{}).status;
+        trailWork();
+        trailUp({ id:part.id||('t'+CHAT.trail.length), kind:trailKind(part.tool),
+          detail:actDetail(part), s:s==='completed'?'ok':s==='error'?'no':'run' });
       } else if(part.type==='reasoning'){
-        chatSub('Thinking…');
+        chatSub('Thinking…'); trailThink();
       } else if(part.type==='text'&&part.messageID===ENGINE.aid){
+        trailWork();
         ENGINE.text=part.text||'';
         chatChunk(ENGINE.text);
       }
@@ -4281,6 +4426,9 @@ if(TAU&&TAU.core) TAU.core.invoke('settings_get').then(s=>applySettings(s,true))
    while to answer, so try a handful of times and then stop asking — a page that
    polls an engine forever is just noise on the UI thread. */
 [900, 4000, 9000, 16000].forEach(ms => setTimeout(() => AIBridge.load(), ms));
+/* Réveiller le moteur dès l'ouverture : le premier message ne paie pas le
+   démarrage à froid. Silencieux — s'il n'est pas installé, tant pis. */
+setTimeout(()=>{ AIBridge.ensure().catch(()=>{}) }, 2500);
 
 /* the gear on the island */
 { const gear=$('#d2Settings');
@@ -4303,30 +4451,143 @@ window.__api={NEMO,buddy,MOOD,charAt,HOME,expand,collapse,setMode,addTask,setTas
 })();
 </script>
 <style id="axcss">
-#ax{position:absolute;right:10px;top:10px;width:304px;max-height:566px;display:flex;flex-direction:column;z-index:30;background:rgba(16,18,26,.84);backdrop-filter:blur(26px) saturate(1.5);-webkit-backdrop-filter:blur(26px);border:1px solid rgba(255,255,255,.15);border-radius:16px;color:#fff;font:12px/1.35 var(--font);box-shadow:0 22px 44px -14px #000b;cursor:default}
-#ax.hide{display:none}#ax.min .axb,#ax.min .axt,#ax.min .axp{display:none}
-#ax button,#ax input,#ax select{font:inherit;color:#fff}
-.axh{display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid rgba(255,255,255,.1)}
-.axh b{flex:1;font-size:13px}.axh i{width:8px;height:8px;border-radius:50%;background:#2ecc71;display:inline-block;margin-right:5px}
-.axh i.on{background:#ff5a5f;animation:axp 1s infinite}@keyframes axp{50%{opacity:.35}}
-.axs{background:#e5484d;border:0;border-radius:7px;padding:3px 8px;cursor:pointer;font-weight:600}
-.axg{background:rgba(255,255,255,.12);border:0;border-radius:7px;padding:3px 7px;cursor:pointer}
-.axg:hover{background:rgba(255,255,255,.22)}
-.axp{display:flex;flex-wrap:wrap;gap:5px;padding:7px 11px 0}
-.axp span{padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.1);cursor:pointer;opacity:.55}.axp span.on{opacity:1;background:rgba(80,140,255,.4)}
-.axc{display:flex;gap:6px;padding:8px 11px}.axc input{flex:1;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:5px 8px;min-width:0}
-.axt{display:flex;gap:2px;padding:0 8px}.axt button{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:5px 2px;cursor:pointer;opacity:.6;position:relative}
-.axt button.on{opacity:1;border-color:#5b9bff}.axt em{position:absolute;top:0;right:2px;background:#ff5a5f;border-radius:99px;font-style:normal;font-size:10px;padding:0 5px}
-.axb{overflow:auto;padding:8px 11px 11px;display:flex;flex-direction:column;gap:6px;min-height:120px}
-.axr{background:rgba(255,255,255,.08);border-radius:10px;padding:7px 9px;display:flex;flex-direction:column;gap:5px}
-.axr.ap{border:1px solid #ff5a5f88;background:rgba(255,90,95,.1)}
-.axr .row{display:flex;gap:6px;align-items:center}.axr .row>span:first-of-type{flex:1}
-.tag{font-size:10px;padding:1px 6px;border-radius:99px;color:#111;font-weight:700}
-.dot{width:8px;height:8px;border-radius:50%;flex:none}.axr button{border:0;border-radius:7px;padding:3px 8px;cursor:pointer;background:rgba(255,255,255,.14)}
-.axr button.al{background:#2f9e5b}.axr button.dn{background:#e5484d}.axr button.ar{background:#2f6bff}
+/* ═══ Agent Hub — command-center design system: near-black glass, quiet
+   borders, blue/purple accent. Scoped under #ax so Nemo & Nini never feel it. */
+#ax{--axline:rgba(255,255,255,.08);--axt1:#F5F7FA;--axt2:#9AA1AD;--axblue:#4C8DFF;--axpurple:#8B5CF6;--axgreen:#2ecc71;--axamber:#f5a623;--axred:#ff5a5f;
+position:fixed;right:14px;top:14px;width:min(352px,calc(100vw - 28px));max-height:min(640px,calc(100vh - 28px));display:flex;flex-direction:column;z-index:650;
+background:rgba(11,13,18,.88);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
+border:1px solid var(--axline);border-radius:16px;color:var(--axt1);font:12px/1.35 var(--font);
+box-shadow:0 24px 60px -20px rgba(0,0,0,.75),0 2px 10px rgba(0,0,0,.35);cursor:default;animation:axup .18s ease}
+#ax.hide{display:none}
+#ax.min .axb,#ax.min .axt,#ax.min .axp{display:none}
+#ax button,#ax input,#ax select{font:inherit;color:inherit}
+#ax button{transition:background .12s,transform .08s,border-color .12s,opacity .12s}
+#ax button:active{transform:scale(.96)}
+/* ── header: title + glowing Online chip + Stop / minimize / close ────── */
+#ax .axh{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--axline)}
+#ax .axttl{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
+#ax .axh i{width:7px;height:7px;border-radius:50%;background:var(--axblue);flex:none}
+#ax .axh i.on{background:var(--axblue);box-shadow:0 0 8px rgba(76,141,255,.8);animation:axp 1.1s infinite}
+#ax .axttl #axName{font-size:13px;font-weight:650;letter-spacing:.2px;white-space:nowrap}
+#ax .axon{display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--axt2);padding:2px 7px;border:1px solid var(--axline);border-radius:99px;background:rgba(255,255,255,.04);white-space:nowrap}
+#ax .axon i{width:6px;height:6px;border-radius:50%;background:var(--axgreen);box-shadow:0 0 6px rgba(46,204,113,.7);animation:axglow 2.2s ease-in-out infinite;flex:none}
+#ax .axon.off i{background:var(--axred);box-shadow:none;animation:none}
+#ax .axon.off{color:#cf9a9a}
+#ax .axs{background:rgba(229,72,77,.14);border:1px solid rgba(229,72,77,.5);color:#ff8f93;border-radius:8px;padding:3px 9px;cursor:pointer;font-weight:600;font-size:11px}
+#ax .axs:hover{background:rgba(229,72,77,.24)}
+#ax .axg{background:rgba(255,255,255,.06);border:1px solid var(--axline);border-radius:8px;padding:3px 8px;cursor:pointer;color:var(--axt2);min-width:24px}
+#ax .axg:hover{background:rgba(255,255,255,.11);color:var(--axt1)}
+/* ── status strip: what the agent is doing, right now ─────────────────── */
+#ax .axst{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:11px;border-bottom:1px solid var(--axline);background:rgba(255,255,255,.025);min-height:15px}
+#ax .axst:empty{display:none}
+#ax .axst i{width:6px;height:6px;border-radius:50%;flex:none}
+#ax .axst b{font-weight:600;white-space:nowrap}
+#ax .axst span{color:var(--axt2);font-size:10.5px;margin-left:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ── interruption pills (watched apps) ────────────────────────────────── */
+#ax .axp{display:flex;flex-wrap:wrap;gap:5px;padding:9px 12px 0}
+#ax .axp:empty{display:none}
+#ax .axp span{padding:3px 9px;border-radius:99px;background:rgba(255,255,255,.05);border:1px solid var(--axline);cursor:pointer;opacity:.6;font-size:11px;transition:opacity .12s,background .12s;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block}
+#ax .axp span:hover{opacity:.95}
+#ax .axp span.on{opacity:1;background:rgba(76,141,255,.15);border-color:rgba(76,141,255,.45);color:#9dc0ff}
+/* ── tabs: text-only with an animated accent underline ────────────────── */
+#ax .axt{display:flex;gap:2px;padding:7px 8px 0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--axline)}
+#ax .axt::-webkit-scrollbar{display:none}
+#ax .axt button{flex:0 0 auto;background:none;border:0;border-bottom:2px solid transparent;padding:6px 9px 8px;cursor:pointer;opacity:.55;position:relative;font-size:11.5px;color:var(--axt2);white-space:nowrap}
+#ax .axt button:hover{opacity:.85}
+#ax .axt button.on{opacity:1;color:#8fb6ff}
+#ax .axt button::after{content:"";position:absolute;left:7px;right:7px;bottom:-1px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--axblue),var(--axpurple));transform:scaleX(0);transition:transform .16s ease}
+#ax .axt button.on::after{transform:scaleX(1)}
+#ax .axt em{position:absolute;top:1px;right:0;background:var(--axred);border-radius:99px;font-style:normal;font-size:9.5px;padding:0 5px;color:#fff;font-weight:700}
+/* ── body: the scrollable work area ───────────────────────────────────── */
+#ax .axb{overflow-y:auto;overscroll-behavior:contain;padding:10px 12px;display:flex;flex-direction:column;gap:7px;flex:1 1 auto;min-height:96px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+#ax .axb::-webkit-scrollbar{width:8px}
+#ax .axb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:8px;border:2px solid transparent;background-clip:content-box}
+/* ── activity / approve / routine / permission rows ───────────────────── */
+#ax .axr{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:7px;transition:background .12s,border-color .12s}
+#ax .axr:hover{background:rgba(255,255,255,.065)}
+#ax .axr.fresh{animation:axin .18s ease}
+#ax .axr.ap{border-color:rgba(245,166,35,.35);background:rgba(245,166,35,.06)}
+#ax .axr.ap:hover{background:rgba(245,166,35,.09)}
+#ax .axr.jump{cursor:pointer}
+#ax .axr.jump:hover{border-color:rgba(76,141,255,.45)}
+#ax .axr .row{display:flex;gap:8px;align-items:center}
+#ax .ax-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#ax .ax-ttl{display:flex;gap:6px;align-items:center;font-weight:600;font-size:11.5px;min-width:0}
+#ax .ax-ttl .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ax .ax-sub{font-size:10.5px;color:var(--axt2);display:flex;gap:6px;align-items:center;min-width:0}
+#ax .ax-sub .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ax .ax-sub time{margin-left:auto;opacity:.55;font-size:10px;flex:none;font-variant-numeric:tabular-nums}
+#ax .ax-ic{width:22px;height:22px;flex:none;border-radius:7px;display:grid;place-items:center;font-size:12px;line-height:1;color:var(--c,#9AA1AD);background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+#ax .ax-ic.run{box-shadow:inset 0 0 0 1px rgba(76,141,255,.55);animation:axp 1.2s infinite}
+#ax .ax-ic.no{box-shadow:inset 0 0 0 1px rgba(255,90,95,.55)}
+#ax .tag{font-size:9.5px;padding:1.5px 7px;border-radius:99px;font-weight:650;letter-spacing:.2px;flex:none;white-space:nowrap}
+#ax .ax-acts{display:flex;gap:6px;flex-wrap:wrap}
+#ax .ax-acts button{border:1px solid var(--axline);background:rgba(255,255,255,.05);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:11px;color:var(--axt1)}
+#ax .ax-acts button:hover{background:rgba(255,255,255,.1)}
+#ax .ax-acts button.p{background:var(--axblue);border-color:transparent;color:#fff;font-weight:600}
+#ax .ax-acts button.p:hover{background:#5f9bff}
+#ax .ax-acts button.dn{color:#ff9599;border-color:rgba(255,90,95,.35);background:rgba(255,90,95,.07)}
+#ax .ax-acts button.dn:hover{background:rgba(255,90,95,.14)}
+#ax .ax-acts button.al{color:#7fe0a7;border-color:rgba(46,204,113,.35);background:rgba(46,204,113,.07)}
+#ax .ax-acts button.ar{color:#a9c4ff;border-color:rgba(76,141,255,.35);background:rgba(76,141,255,.08)}
+#ax button.undo{border:1px solid rgba(245,166,35,.4);background:rgba(245,166,35,.1);color:#ffc861;border-radius:8px;padding:3px 9px;cursor:pointer;font-size:10.5px;margin-left:auto;flex:none}
+#ax button.undo:hover{background:rgba(245,166,35,.18)}
+/* ── context: information cards, attach actions, chips, window list ───── */
+#ax .ax-cards{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+#ax .ax-card{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:8px 10px;min-width:0}
+#ax .ax-card span{display:block;font-size:9.5px;letter-spacing:.3px;text-transform:uppercase;color:var(--axt2);margin-bottom:2px}
+#ax .ax-card b{font-size:11.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+#ax .ax-chips{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+#ax .ax-chips .tag{background:rgba(76,141,255,.14);color:#9dc0ff;border:1px solid rgba(76,141,255,.3);padding:3px 8px;font-size:10.5px}
+#ax .ax-chips .tag a{cursor:pointer;color:#ff9599;text-decoration:none;font-weight:700;padding:0 2px}
+#ax .ax-wins{display:flex;flex-wrap:wrap;gap:5px}
+#ax .ax-wins button{border:1px solid var(--axline);background:rgba(255,255,255,.05);border-radius:8px;padding:4px 9px;cursor:pointer;font-size:11px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--axt1)}
+#ax .ax-wins button:hover{border-color:rgba(76,141,255,.45);background:rgba(76,141,255,.1)}
+/* ── safety: permission chips + model row ─────────────────────────────── */
+#ax .chip{border:1px solid var(--axline);border-radius:99px;padding:3px 10px;font-size:10.5px;cursor:pointer;background:rgba(255,255,255,.05);color:var(--axt2);margin-left:auto;flex:none;transition:.12s}
+#ax .chip:hover{background:rgba(255,255,255,.1)}
+#ax .chip.ok{color:#7fe0a7;border-color:rgba(46,204,113,.4);background:rgba(46,204,113,.08)}
+#ax .chip.ask{color:#ffcf7a;border-color:rgba(245,166,35,.4);background:rgba(245,166,35,.08)}
+#ax .chip.no{color:#ff9599;border-color:rgba(255,90,95,.4);background:rgba(255,90,95,.08)}
+#ax .axr .sdot{width:7px;height:7px;border-radius:50%;background:#5A6070;flex:none}
+#ax .axr .sdot.on{background:var(--axgreen);box-shadow:0 0 6px rgba(46,204,113,.6)}
+#ax .edin{display:flex;gap:5px;width:100%}
+#ax .edin input{min-width:0;flex:1}
+/* ── section labels, empty states ─────────────────────────────────────── */
+#ax .ax-lbl{font-size:9.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--axt2);margin-top:3px}
+#ax .ax-empty{display:flex;flex-direction:column;align-items:center;gap:7px;padding:20px 12px;color:var(--axt2);font-size:11px;text-align:center}
+#ax .ax-empty i{font-size:17px;opacity:.55;font-style:normal}
+#ax select,#ax input[type=time]{background:rgba(255,255,255,.06);border:1px solid var(--axline);border-radius:8px;padding:4px 7px;color:var(--axt1);color-scheme:dark}
+#ax select:focus,#ax input[type=time]:focus{outline:none;border-color:rgba(76,141,255,.5)}
+#ax .rtnow{display:flex;gap:5px;align-items:center;padding:2px}
+#ax .rtnow input{background:rgba(255,255,255,.06);border:1px solid var(--axline);border-radius:8px;padding:6px 8px;min-width:0;color:var(--axt1)}
+#ax .rtnow input:focus{outline:none;border-color:rgba(76,141,255,.5)}
+/* ── console: ask field + mic + run / running state ───────────────────── */
+#ax .axc{display:flex;gap:6px;padding:9px 12px 11px;border-top:1px solid var(--axline);background:rgba(255,255,255,.02)}
+#ax .axc input{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--axline);border-radius:10px;padding:7px 10px;min-width:0;color:var(--axt1);transition:border-color .12s,box-shadow .12s}
+#ax .axc input::placeholder{color:rgba(154,161,173,.75)}
+#ax .axc input:focus{outline:none;border-color:rgba(76,141,255,.55);box-shadow:0 0 0 3px rgba(76,141,255,.14)}
+#ax .axc button{border-radius:10px;border:1px solid var(--axline);background:rgba(255,255,255,.06);cursor:pointer;height:30px;min-width:32px;display:grid;place-items:center;color:var(--axt2);font-size:13px}
+#ax .axc button:hover{background:rgba(255,255,255,.11);color:var(--axt1)}
+#ax #axGo{background:var(--axblue);border-color:transparent;color:#fff;font-weight:600}
+#ax #axGo:hover{background:#5f9bff}
+#ax #axGo.busy{width:auto;min-width:0;background:rgba(76,141,255,.14);border-color:rgba(76,141,255,.45);color:#9dc0ff;display:flex;gap:6px;align-items:center;font-size:11px;padding:0 11px}
+.spin{width:11px;height:11px;border:2px solid rgba(157,192,255,.3);border-top-color:currentColor;border-radius:50%;animation:axspin .7s linear infinite;display:inline-block;flex:none}
+/* ── the pointer that flies to the agent's target ─────────────────────── */
 .axx{position:absolute;width:20px;height:20px;z-index:29;pointer-events:none;transition:left .9s ease,top .9s ease,opacity .3s;opacity:0;filter:drop-shadow(0 2px 4px #0009)}
-.axx.on{opacity:1}.axx::after{content:"";position:absolute;left:-6px;top:-6px;width:12px;height:12px;border-radius:50%;border:2px solid #5b9bff;opacity:0}.axx.clk::after{animation:axc .5s}@keyframes axc{from{opacity:1;transform:scale(.4)}to{opacity:0;transform:scale(2.4)}}
-#axBtn{position:relative}#axBtn em{position:absolute;top:0;right:0;background:#ff5a5f;color:#fff;border-radius:99px;font-style:normal;font-size:9px;padding:0 4px}
+.axx.on{opacity:1}.axx::after{content:"";position:absolute;left:-6px;top:-6px;width:12px;height:12px;border-radius:50%;border:2px solid var(--axblue);opacity:0}.axx.clk::after{animation:axc .5s}
+/* ── the desktop launcher (shown while the hub is closed) ─────────────── */
+#axFab{position:fixed;top:14px;right:14px;width:38px;height:38px;border-radius:12px;background:rgba(11,13,18,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.1);box-shadow:0 12px 30px -10px rgba(0,0,0,.7);display:grid;place-items:center;padding:0;cursor:pointer;z-index:650;transition:transform .12s,background .12s}
+#axFab:hover{background:rgba(20,24,34,.94);transform:translateY(-1px)}
+#axFab:active{transform:scale(.93)}
+#axFab svg{width:24px;height:24px;display:block}
+#axFab em{position:absolute;top:-4px;right:-5px;background:var(--axred);color:#fff;border-radius:99px;font-style:normal;font-size:10px;line-height:1.5;padding:0 5px;font-weight:700}
+@keyframes axp{50%{opacity:.35}}
+@keyframes axc{from{opacity:1;transform:scale(.4)}to{opacity:0;transform:scale(2.4)}}
+@keyframes axin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes axup{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes axglow{50%{box-shadow:0 0 0 3px rgba(46,204,113,.16)}}
+@keyframes axspin{to{transform:rotate(360deg)}}
 </style>
 <script id="axjs">
 (()=>{
@@ -4335,6 +4596,9 @@ const E=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"
 /* The hub is a window onto the real engine: every line below comes from an
    opencode event. No scripted plan, no invented tools, no fake approvals. */
 const LT=k=>(window.NNi18n?window.NNi18n.t(k):k);
+const TAURI=window.__TAURI__;
+const W=id=>document.getElementById(id);
+const beep=n=>{try{window.__snd.play(n||'blip')}catch(e){}};
 /* Step labels — the same short, safe vocabulary the reference gateway shows
    for engine activity: what kind of work each line is, never raw reasoning. */
 const RK={
@@ -4352,43 +4616,146 @@ function stepOf(name){
   if(n==='task'||n==='todowrite'||n==='todoread')return'task';
   return'tool';
 }
-const st={tab:'act',act:[],q:[],ctx:[],run:false,text:'',aid:null};
-const beep=n=>{try{window.__snd.play(n||'blip')}catch(e){}};
-const W=id=>document.getElementById(id);
-const TAURI=window.__TAURI__;
-S.insertAdjacentHTML('beforeend','<div id="ax"><div class="axh"><b><i id="axI"></i>Agent Hub</b><span id="axPriv" title="Privacy"></span><button class="axs" id="axStop">■ Stop</button><button class="axg" id="axMin">–</button></div><div class="axc"><input id="axIn" placeholder="Ask the agent…"><button class="axg" id="axGo">▶</button></div><div class="axt" id="axT"></div><div class="axb" id="axB"></div></div>');
-const ax=W('ax'),B=W('axB');
+const st={tab:'act',act:[],q:[],ctx:[],run:false,apps:[],lastWin:'',
+  ints:{},rules:{},rt:[],log:[],models:[],busy:false,err:false,eng:true,provs:[],editRt:-1};
+/* every activity line carries the moment it happened, for the timeline */
+const pushAct=o=>{o.ts=o.ts||Date.now();st.act.push(o);return o};
+/* routines, permission rules and the interruption pills are the user's own —
+   they survive a restart like everything else on this machine. */
+try{const raw=JSON.parse(localStorage.getItem('nn-hub')||'{}');
+ st.ints=raw.ints||{};st.rules=raw.rules||{};st.rt=raw.rt||[];st.log=raw.log||[];}catch(e){}
+const save=()=>{try{localStorage.setItem('nn-hub',JSON.stringify({ints:st.ints,rules:st.rules,rt:st.rt,log:st.log.slice(-12)}))}catch(e){}};
+const SAFE=['bash','edit','write','webfetch','websearch','read','grep','task'];
+/* which agent is speaking — the session's agent, exactly as Settings set it */
+const WHO={build:['🛠','Build'],plan:['📋','Plan'],general:['🤖','General']};
+const who=()=>WHO[(window.__cfg&&window.__cfg.agent)||'general']||WHO.general;
+const err=(txt,e)=>{st.err=1;pushAct({id:'x'+Date.now(),txt:txt,kind:'danger',s:'no',note:String(e)});render()};
+S.insertAdjacentHTML('beforeend','<button id="axFab" title="Agent Hub"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#2F6BFF"/><circle cx="9" cy="11" r="1.6" fill="#fff"/><circle cx="15" cy="11" r="1.6" fill="#fff"/><path d="M8.5 15c2 1.6 5 1.6 7 0" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg><em hidden></em></button><div id="ax"><div class="axh"><div class="axttl"><i id="axI"></i><span id="axName">Agent Hub</span><span class="axon" id="axOn"><i></i><span id="axOnT">Online</span></span></div><button class="axs" id="axStop">■ Stop</button><button class="axg" id="axMin" title="Minimize">–</button><button class="axg" id="axClose" title="Close">×</button></div><div class="axst" id="axPriv"></div><div class="axp" id="axP"></div><div class="axt" id="axT"></div><div class="axb" id="axB"></div><div class="axc"><input id="axIn"><button id="axMic" title="Voice">🎤</button><button id="axGo">▶</button></div></div><svg class="axx" id="axCur" viewBox="0 0 20 20"><path d="M3 2l13 7-6 2-2 6z" fill="#fff" stroke="#111" stroke-width="1.2"/></svg>');
+const ax=W('ax'),cur=W('axCur'),B=W('axB'),fab=W('axFab');
+function openHub(){ax.classList.remove('hide','min');render();try{W('axIn').focus()}catch(e){}}
+fab.addEventListener('click',openHub);
+['d2Hub','hdrHub'].forEach(id=>{const b=W(id);if(b)b.addEventListener('click',openHub)});
 ['pointerdown','click','dblclick'].forEach(t=>ax.addEventListener(t,e=>e.stopPropagation()));
-const TABS=[['act','Activity'],['ok','Approve'],['ctx','Context']];
-function wins(){return [...S.querySelectorAll('.win')].filter(w=>w.dataset.state==='open')}
+const TABS=[['act','Activity'],['ok','Approve'],['ctx','Context'],['rt','Routines'],['sf','Safety']];
+const realWins=()=>[...S.querySelectorAll('.win.real')].filter(w=>w.id&&w.dataset.state==='open'&&w.dataset.min!=='1');
+/* "index.html - Visual Studio Code" → "Visual Studio Code" */
+function appName(t){t=String(t||'');if(!t)return'';const m=t.split(/\s+[|\-–—]\s+/);let n=m.length>1?m[m.length-1]:t;return n.length>22?n.slice(0,22):n}
+/* glyph per kind — the timeline's visual vocabulary */
+const IC={think:'◌',shell:'❯',edit:'✎',fetch:'↗',search:'⌕',read:'◫',task:'⚡',tool:'⚙',danger:'!',window:'▣'};
+/* the agent's state, one glance: idle · thinking · working · waiting · done · error */
+function agentState(){
+ if(st.q.length)return{i:'⏸',t:LT('Waiting for approval'),c:'#f5a623'};
+ if(st.run)return{i:st.busy?'⚡':'◌',t:st.busy?LT('Working'):LT('Thinking'),c:st.busy?'#4C8DFF':'#8B5CF6'};
+ if(st.err)return{i:'!',t:LT('Error'),c:'#ff5a5f'};
+ if(st.act.length)return{i:'✓',t:LT('Completed'),c:'#2ecc71'};
+ return{i:'●',t:LT('Idle'),c:'#9AA1AD'}}
+const tsf=t=>{const d=new Date(t||Date.now()),p=n=>String(n).padStart(2,'0');return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())};
+let painted=new Set(),lastLen=0;
+const empty=(icon,txt)=>`<div class="ax-empty"><i>${icon}</i><span>${E(txt)}</span></div>`;
 function render(){
  W('axI').className=st.run?'on':'';W('axStop').style.display=st.run?'':'none';
- W('axPriv').textContent=st.q.length?LT('waiting for you'):'';
+ W('axName').textContent=LT('Agent Hub');W('axStop').textContent='■ '+LT('Stop');
+ /* the Online chip tells the truth about the engine, not a decoration */
+ const onc=W('axOn');onc.className='axon'+(st.eng?'':' off');W('axOnT').textContent=LT(st.eng?'Online':'Offline');
+ const S5=agentState();
+ const priv=st.q.length?LT('waiting for you'):st.ctx.some(c=>c.k==='Screen')?LT('sees screen'):'';
+ W('axPriv').innerHTML=`<i style="background:${S5.c}"></i><b>${S5.i} ${E(S5.t)}</b>${priv?`<span>${E(priv)}</span>`:''}`;
  W('axIn').placeholder=LT('Ask the agent…');
+ W('axP').innerHTML=st.apps.map(a=>`<span class="${st.ints[a]?'on':''}" data-i="${E(a)}">${E(a)}</span>`).join('');
  W('axT').innerHTML=TABS.map(([k,n])=>`<button class="${st.tab===k?'on':''}" data-t="${k}">${LT(n)}${k==='ok'&&st.q.length?`<em>${st.q.length}</em>`:''}</button>`).join('');
- const bb=W('axBtn');if(bb&&bb.querySelector('em'))bb.querySelector('em').textContent=st.q.length||'';
+ const n=st.q.length,e=fab.querySelector('em');if(e){e.textContent=n||'';e.hidden=!n}
+ fab.style.display=ax.classList.contains('hide')?'grid':'none';
+ const g=W('axGo');g.classList.toggle('busy',!!st.run);
+ g.innerHTML=st.run?`<i class="spin"></i><span>${E(LT('Running…'))}</span>`:'▶';
+ g.title=st.run?LT('Running…'):'';
  let h='';
- if(st.tab==='act'){h=st.act.length?st.act.slice().reverse().map(a=>`<div class="axr"><div class="row"><span class="dot" style="background:${a.s==='run'?'#5b9bff':a.s==='ok'?'#2ecc71':'#ff5a5f'}"></span><span>${E(LT(a.lab||a.txt))}</span><span class="tag" style="background:${(RK[a.kind]||RK.tool)[0]}">${LT((RK[a.kind]||RK.tool)[1])}</span></div><div class="row"><span style="opacity:.65">${E(LT(a.note||a.s))}</span></div></div>`).join(''):`<div style="opacity:.6">${LT('Nothing yet. Ask something above — every line here comes from the engine.')}</div>`}
- if(st.tab==='ok'){h=st.q.length?st.q.map(a=>`<div class="axr ap"><div class="row"><span><b>${LT('Permission')}</b> — ${E(a.txt)}</span></div><div class="row"><button class="al" data-a="once" data-q="${a.id}">${LT('Allow once')}</button><button class="ar" data-a="always" data-q="${a.id}">${LT('Always')}</button><button class="dn" data-a="reject" data-q="${a.id}">${LT('Reject')}</button></div></div>`).join(''):`<div style="opacity:.6">${LT('No pending requests. When the engine needs a tool it asks here.')}</div>`}
- if(st.tab==='ctx'){h='<div class="row" style="display:flex;gap:5px;flex-wrap:wrap">'+(wins().map(w=>`<button class="axg" data-c="Window: ${E(w.id)}">+ ${E(w.id)}</button>`).join('')||`<span style="opacity:.6">${LT('No windows open.')}</span>`)+'</div><div style="display:flex;gap:5px;flex-wrap:wrap">'+(st.ctx.map((c,i)=>`<span class="tag" style="background:#9cc2ff">${E(c.k)} <a data-x="${i}" style="cursor:pointer">✕</a></span>`).join('')||`<span style="opacity:.6">${LT('No context attached.')}</span>`)+'</div>'}
- B.innerHTML=h}
+ if(st.tab==='act'){h=st.act.length?st.act.slice().reverse().map(a=>{const r=RK[a.kind]||RK.tool;
+   const sc=a.s==='run'?'#5b9bff':a.s==='ok'?'#2ecc71':'#ff5a5f';
+   const nw=painted.has(a.id)?'':' fresh';
+   const undo=a.s==='ok'&&a.kind==='edit'&&a.file&&!a.undone?`<button class="undo" data-u="${a.id}">↩ ${LT('Undo')}</button>`:'';
+   const wt=a.who?`${a.who[0]} ${E(LT(a.who[1]))} · `:'';
+   return `<div class="axr${a.win?' jump':''}${nw}"${a.win?` data-f="${a.win}"`:''}><div class="row"><span class="ax-ic ${a.s==='run'?'run':a.s==='no'?'no':''}" style="--c:${sc}">${IC[a.kind]||'⚙'}</span><div class="ax-col"><div class="ax-ttl"><span class="t">${E(a.pre||LT(a.lab||a.txt))}</span><span class="tag" style="background:${r[0]}1f;color:${r[0]}">${LT(r[1])}</span></div><div class="ax-sub"><span class="n">${wt}${E(LT(a.note||a.s))}</span><time>${tsf(a.ts)}</time></div></div>${undo}</div></div>`}).join('')
+  :empty('▣',LT('Nothing yet. Ask something above — every line here comes from the engine.'))}
+ if(st.tab==='ok'){h=st.q.length?st.q.map(a=>{const r=RK[a.kind]||RK.tool;
+   return `<div class="axr ap"><div class="row"><span class="ax-ic" style="--c:${r[0]}">${IC[a.kind]||'⚙'}</span><div class="ax-col"><div class="ax-ttl"><span class="t">${who()[0]} ${E(LT(who()[1]))} ${LT('wants to:')}</span><span class="tag" style="background:${r[0]}1f;color:${r[0]}">${LT(r[1])}</span></div><div class="ax-sub"><span class="n">${E(a.txt)}</span></div></div></div><div class="ax-acts"><button class="p" data-a="once" data-q="${a.id}">${LT('Approve')}</button><button class="dn" data-a="reject" data-q="${a.id}">${LT('Reject')}</button><button class="ar" data-a="always" data-q="${a.id}">${LT('Always')}</button></div></div>`}).join('')
+  :empty('✓',LT('No pending requests. When the engine needs a tool it asks here.'))}
+ if(st.tab==='ctx'){
+  const ws=String((window.__cfg&&window.__cfg.workspace)||'');
+  const wsn=ws?ws.split(/[\\/]/).filter(Boolean).pop():'~';
+  const rw=realWins();
+  h=`<div class="ax-cards"><div class="ax-card"><span>${LT('Workspace')}</span><b>${E(wsn)}</b></div><div class="ax-card"><span>${LT('Agent')}</span><b>${who()[0]} ${E(LT(who()[1]))}</b></div><div class="ax-card"><span>${LT('Engine')}</span><b>${st.provs.length?E(st.provs.join(', ')):'—'}</b></div><div class="ax-card"><span>${LT('Windows')}</span><b>${rw.length}</b></div></div>`;
+  h+=`<div class="ax-wins"><button data-cs="1">+ ${LT('Screen')}</button><button data-cb="1">+ ${LT('Clipboard')}</button>`
+   +rw.map(w=>`<button data-cw="${w.id}">+ ${E((w.dataset.title||w.id).slice(0,26))}</button>`).join('')+`</div>`;
+  if(!rw.length)h+=empty('▢',LT('No windows open.'));
+  h+=`<div class="ax-chips">`
+   +(st.ctx.map((c,i)=>`<span class="tag">${E(LT(c.k))} <a data-x="${i}">✕</a></span>`).join('')||`<span style="opacity:.6">${LT('No context attached.')}</span>`)
+   +`</div>`}
+ if(st.tab==='rt'){h=st.rt.length?st.rt.map((r,i)=>{const ed=st.editRt===i;
+   return `<div class="axr"><div class="row"><div class="ax-col">${ed
+    ?`<div class="edin"><input type="time" id="axEt" value="${E(r.t)}"><input id="axEn" value="${E(r.n)}" style="flex:1"></div>`
+    :`<div class="ax-ttl"><span class="t">${E(r.n)}</span><span class="sdot ${r.on?'on':''}"></span></div><div class="ax-sub"><span class="n">${LT('Every day')} · ${E(r.t)}</span></div>`}</div></div>
+   <div class="ax-acts"><button data-ro="${i}" class="${r.on?'al':''}">${LT(r.on?'On':'Off')}</button><button data-rr="${i}">${LT('Run')}</button>${ed?`<button class="p" id="axEs">${LT('Save')}</button>`:`<button data-re="${i}">${LT('Edit')}</button>`}<button class="dn" data-rd="${i}">✕</button></div></div>`}).join('')
+  :empty('⏱',LT('No routines yet. Add one below — they run through the engine.'));
+  h+=`<div class="rtnow"><input type="time" id="axRt" value="09:00"><input id="axRn" placeholder="${E(LT('New routine…'))}" style="flex:1"><button class="axg" id="axRa">+</button></div>`;
+  h+=`<div class="ax-lbl">${LT('Recent tasks')}</div>`;
+  h+=st.log.length?st.log.slice(-4).reverse().map(l=>`<div class="axr"><div class="row"><div class="ax-col"><div class="ax-ttl"><span class="t">${E(l)}</span></div></div><button data-rl="${E(l)}">${LT('Again')}</button></div></div>`).join('')
+   :empty('·',LT('Nothing yet.'))}
+ if(st.tab==='sf'){
+  const SUB={bash:LT('Terminal'),edit:LT('Files'),write:LT('Files'),webfetch:LT('Browser'),websearch:LT('Browser')};
+  h=`<div class="ax-lbl">${LT('App permissions')}</div>`;
+  h+=SAFE.map(k=>{const r=st.rules[k]||'ask';const nm=k[0].toUpperCase()+k.slice(1);
+   return `<div class="axr"><div class="row"><div class="ax-col"><div class="ax-ttl"><span class="t">${E(nm)}</span></div>${SUB[k]?`<div class="ax-sub"><span class="n">${E(SUB[k])}</span></div>`:''}</div><button data-s="${k}" class="chip ${r==='allow'?'ok':r==='block'?'no':'ask'}">${LT(r==='allow'?'Allowed':r==='block'?'Blocked':'Ask')}</button></div></div>`}).join('');
+  const curm=(window.__cfg&&window.__cfg.model)||'';
+  h+=`<div class="ax-lbl">${LT('Model')}</div><div class="axr"><div class="row"><select id="axM" style="margin-left:auto;max-width:170px">${(st.models.length?st.models:[curm]).filter(Boolean).map(m=>`<option value="${E(m)}" ${m===curm?'selected':''}>${E(m.split('/').pop())}</option>`).join('')}</select></div></div>`;
+  const n=Object.keys(st.rules).filter(k=>st.rules[k]==='allow').length;
+  h+=`<button class="axg" id="axClr" style="width:100%;padding:6px">${LT('Clear always-allow rules')} (${n})</button>`}
+ B.innerHTML=h;
+ st.act.forEach(a=>painted.add(a.id));
+ if(st.tab==='act'&&st.act.length>lastLen)B.scrollTop=0;
+ lastLen=st.act.length}
 function reply(id,r){const i=st.q.findIndex(x=>x.id===id);if(i<0)return;st.q.splice(i,1);render();
  if(TAURI)TAURI.core.invoke('oc_permission',{request:id,reply:r}).catch(()=>{})}
+/* the reference hub's flourish: a pointer that flies to the window the task
+   is working on and clicks there when the task starts. */
+async function go(el){const x=el.offsetLeft+el.offsetWidth/2,y=el.offsetTop+40;
+ cur.style.left=x+'px';cur.style.top=y+'px';cur.classList.add('on');
+ await sl(950);cur.classList.add('clk');await sl(500);cur.classList.remove('clk')}
+/* Undo a finished edit for real: the agent is asked to put the file back. */
+async function undo(id){const a=st.act.find(x=>x.id===id);if(!a||!a.file)return;
+ a.undone=1;a.note=LT('Undone');render();
+ run('Undo the last change you made to '+a.file+' — put that file back the way it was.')}
 async function run(text){
  if(!text||!TAURI)return;
+ st.err=false;st.busy=false;
  let info=null;try{info=await TAURI.core.invoke('oc_status')}catch(e){}
  if(!info||!info.running){try{info=await TAURI.core.invoke('oc_start')}
-  catch(e){st.act.push({id:'e'+Date.now(),txt:'The engine is not running.',kind:'danger',s:'no',note:String(e)});render();return}}
+  catch(e){err(LT('The engine is not running.'),e);return}}
+ st.eng=true;
  const sess=await window.__ai.session();
- st.act.push({id:'t'+Date.now(),txt:'Task: '+text,kind:'task',s:'ok',note:'sent to the engine'});render();
- try{ await TAURI.core.invoke('oc_prompt',{session:sess,text,
-   model:(window.__cfg&&window.__cfg.model)||'',agent:(window.__cfg&&window.__cfg.agent)||''}) }
- catch(e){ st.act.push({id:'e'+Date.now(),txt:'The engine refused that.',kind:'danger',s:'no',note:String(e)});render() } }
-function stop(){if(window.__ai)window.__ai.abort();st.run=false;
- st.act.push({id:'s'+Date.now(),txt:'Stopped.',kind:'danger',s:'no',note:'by you'});render()}
+ /* whatever was attached in Context rides along with the task, plainly
+    enough for the agent to act on: a screenshot file it can open, the
+    clipboard's text, the name of the window you pointed at. */
+ let pre='';
+ for(const c of st.ctx){
+  if(c.k==='Screen')pre+='[Screen: '+(c.file||'')+']\n';
+  else if(c.k==='Clipboard')pre+='[Clipboard]\n'+(c.text||'')+'\n';
+  else if(c.k==='Window')pre+='[Window: '+(c.title||'')+']\n'}
+ const winc=st.ctx.find(c=>c.k==='Window'&&c.hw&&document.getElementById(c.hw));
+ st.lastWin=winc?winc.hw:'';
+ const row={id:'t'+Date.now(),pre:LT('Task: ')+text,txt:'Task: '+text,kind:'task',s:'run',who:who(),win:st.lastWin,note:LT('sent to the engine')};
+ pushAct(row);st.log.push(text);save();render();
+ if(winc)go(document.getElementById(winc.hw));
+ try{ await TAURI.core.invoke('oc_prompt',{session:sess,text:pre+text,
+   model:(window.__cfg&&window.__cfg.model)||'',agent:(window.__cfg&&window.__cfg.agent)||''});
+  row.s='ok' }
+ catch(e){ row.s='no';row.kind='danger';err(LT('The engine refused that.'),e) }
+ render() }
+function stop(){if(window.__ai)window.__ai.abort();st.run=false;st.busy=false;cur.classList.remove('on');
+ pushAct({id:'s'+Date.now(),txt:LT('Stopped.'),kind:'danger',s:'no',note:LT('by you')});render()}
 /* every engine event becomes a line in Activity, or a request in Approve */
 function hubEvent(ev){
  if(!ev||!ev.properties)return;
+ st.eng=true;
  const p=ev.properties;
  if(ev.type==='message.part.updated'){
   const part=p.part||{};
@@ -4398,39 +4765,148 @@ function hubEvent(ev){
    const stt=(part.state&&part.state.status)||'running';
    const id=part.id||('r'+(part.messageID||''));
    let a=st.act.find(x=>x.id===id);
-   if(!a){a={id:id,lab:'Thinking',kind:'think',s:'run',note:''};st.act.push(a)}
+   if(!a){a={id:id,lab:'Thinking',kind:'think',s:'run',note:'',win:st.lastWin};pushAct(a)}
    a.s=stt==='completed'?'ok':'run';
    st.run=a.s==='run';render();return;
   }
   if(part.type!=='tool')return;
   const name=part.tool||'tool',stt=(part.state&&part.state.status)||'running';
   let a=st.act.find(x=>x.id===part.callID);
-  if(!a){a={id:part.callID||('c'+Math.random()),txt:name,kind:stepOf(name),s:'run',note:stt};st.act.push(a)}
+  if(!a){a={id:part.callID||('c'+Math.random()),txt:name,kind:stepOf(name),s:'run',note:stt,win:st.lastWin};pushAct(a)}
   a.s=stt==='completed'?'ok':stt==='error'?'no':'run';
-  a.note=(part.state&&part.state.title)||stt;
-  st.run=a.s==='run';render();
+  const title=(part.state&&part.state.title)||'';
+  a.note=title||stt;
+  /* an edit's file name is what Undo needs later */
+  if(!a.file&&a.kind==='edit'&&title)a.file=title;
+  st.run=a.s==='run';st.busy=a.s==='run';render();
  } else if(ev.type==='permission.asked'){
-  st.q.push({id:p.id,txt:(p.permission||'tool')+(p.patterns&&p.patterns.length?' · '+p.patterns.join(', '):'')});
-  st.tab='ok';ax.classList.remove('min');beep('blip');render();
+  const tool=String(p.permission||'tool');
+  /* Safety rules answer before you ever see the ask: Allowed auto-approves
+     once (the rule itself lives here, not in the engine), Blocked refuses. */
+  const rule=st.rules[tool];
+  if(rule==='allow'||rule==='block'){
+   pushAct({id:'pa'+p.id,txt:(p.patterns&&p.patterns.length?p.patterns.join(', '):tool),kind:stepOf(tool),s:rule==='allow'?'ok':'no',who:who(),
+    note:rule==='allow'?LT('Allowed automatically'):LT('Blocked automatically')});render();
+   if(TAURI)TAURI.core.invoke('oc_permission',{request:p.id,reply:rule==='allow'?'once':'reject'}).catch(()=>{});
+   return;
+  }
+  st.q.push({id:p.id,txt:tool+(p.patterns&&p.patterns.length?' · '+p.patterns.join(', '):''),kind:stepOf(tool)});
+  st.tab='ok';ax.classList.remove('min','hide');beep('blip');render();
  } else if(ev.type==='session.idle'){
-  st.run=false;render();
+  st.run=false;st.busy=false;cur.classList.remove('on');render();
  }}
 if(TAURI&&TAURI.event)TAURI.event.listen('oc:event',e=>{try{hubEvent(e.payload)}catch(err){}});
 /* the hub owns its labels, so a language change repaints it wholesale */
 window.addEventListener('nn:lang',()=>{try{render()}catch(e){}});
-ax.addEventListener('click',e=>{const t=e.target,d=t.dataset||{};
+/* ── Context: real attachments, taken at the moment you click ─────────── */
+async function attachScreen(){
+ if(!TAURI)return;
+ try{const p=await TAURI.core.invoke('capture_screen');st.ctx.push({k:'Screen',file:p});render()}
+ catch(e){err(LT('Could not take a screenshot.'),e)}}
+async function attachClipboard(){
+ if(!TAURI)return;
+ try{const t=await TAURI.core.invoke('clipboard_text');st.ctx.push({k:'Clipboard',text:t});render()}
+ catch(e){err(LT('Could not read the clipboard.'),e)}}
+/* ── Safety: the free-model list, exactly as Settings collects it ─────── */
+async function loadModels(){
+ if(!TAURI)return;
+ try{const pr=await TAURI.core.invoke('oc_providers');
+  st.eng=true;
+  st.provs=(pr.connected||[]).map(p=>String((p&&p.id)||p)).filter(Boolean);
+  const out=[];
+  for(const p of (pr.all||[])){const ms=p.models||{};
+   for(const id of Object.keys(ms)){const c=ms[id]&&ms[id].cost;
+    if(c&&+c.input===0&&+c.output===0)out.push(p.id+'/'+id)}}
+  st.models=out.slice(0,60);
+  if(st.tab==='sf'||st.tab==='ctx')render();
+ }catch(e){}}
+/* is the engine actually up? answers the Online chip honestly, at boot */
+async function checkEng(){
+ if(!TAURI){st.eng=false;return}
+ const was=st.eng;
+ try{const i=await TAURI.core.invoke('oc_status');st.eng=!!(i&&i.running)}catch(e){st.eng=false}
+ if(st.eng!==was)render()}
+ax.addEventListener('change',async e=>{
+ if(e.target.id!=='axM')return;
+ const m=e.target.value;if(!m||!TAURI)return;
+ try{await TAURI.core.invoke('oc_set_model',{model:m});
+  if(window.__cfg){window.__cfg.model=m;
+   try{const s=await TAURI.core.invoke('settings_get');s.model=m;
+    await TAURI.core.invoke('settings_save',{settings:s})}catch(e2){}}}
+ catch(e2){err(LT('Could not save: ')+e2,e2)}});
+ax.addEventListener('click',async e=>{const t=e.target,d=t.dataset||{};
  if(t.id==='axStop')stop();
- if(t.id==='axMin')ax.classList.toggle('min');
- if(t.id==='axGo'){const v=W('axIn').value.trim();W('axIn').value='';run(v)}
- if(d.t){st.tab=d.t;render()}
+ if(t.id==='axClose'){ax.classList.add('hide');render()}
+ if(t.id==='axMin'){if(ax.classList.contains('min'))ax.classList.add('hide');else ax.classList.add('min');render()}
+ if(t.id==='axMic')mic();
+ if(t.id==='axGo'){if(st.run){stop()}else{const v=W('axIn').value.trim();W('axIn').value='';run(v)}}
+ if(t.id==='axRa'){const n=W('axRn').value.trim(),tm=W('axRt').value||'09:00';
+  if(n){st.rt.push({t:tm,n:n,on:1,last:''});save();render()}}
+ if(t.id==='axClr'){for(const k of Object.keys(st.rules))if(st.rules[k]==='allow')delete st.rules[k];save();render()}
+ if(t.id==='axEs')saveEdit();
+ if(d.re){st.editRt=+d.re;render()}
+ if(d.rd){st.rt.splice(+d.rd,1);if(st.editRt===+d.rd)st.editRt=-1;save();render()}
+ if(d.t){st.tab=d.t;if(d.t==='sf')loadModels();render()}
  if(d.q)reply(d.q,d.a);
- if(d.c){st.ctx.push({k:d.c});render()}if(d.x){st.ctx.splice(+d.x,1);render()}});
+ if(d.i){st.ints[d.i]=st.ints[d.i]?0:1;save();render()}
+ if(d.u)undo(d.u);
+ if(d.ro){const r=st.rt[+d.ro];if(r){r.on=r.on?0:1;save();render()}}
+ if(d.rr){const r=st.rt[+d.rr];if(r)run(r.n)}
+ if(d.rl)run(d.rl);
+ if(d.s){st.rules[d.s]=st.rules[d.s]==='allow'?'block':st.rules[d.s]==='block'?'ask':'allow';save();render()}
+ if(d.cs)attachScreen();
+ if(d.cb)attachClipboard();
+ if(d.cw){const w=document.getElementById(d.cw);if(w){st.ctx.push({k:'Window',title:w.dataset.title,hw:w.id});render()}}
+ if(d.x){st.ctx.splice(+d.x,1);render()}
+ const f=t.closest('[data-f]');
+ if(f&&f.dataset.f&&t.tagName!=='BUTTON'){
+  if(TAURI)TAURI.core.invoke('focus_window',{id:+String(f.dataset.f).slice(2)}).catch(()=>{})}});
 W('axIn').addEventListener('keydown',e=>{e.stopPropagation();
  if(e.key==='Enter'){const v=e.target.value.trim();e.target.value='';run(v)}});
-document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.code==='Space'){e.preventDefault();ax.classList.remove('hide','min');const i=W('axIn');if(i)i.focus()}});
-const tc=document.querySelector('.tb-c');
-if(tc){tc.insertAdjacentHTML('beforeend','<button class="tbi" id="axBtn" title="Agent Hub"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#2F6BFF"/><circle cx="9" cy="11" r="1.6" fill="#fff"/><circle cx="15" cy="11" r="1.6" fill="#fff"/><path d="M8.5 15c2 1.6 5 1.6 7 0" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg><em></em></button>');
- W('axBtn').addEventListener('click',()=>ax.classList.toggle('hide'))}
+/* editing a routine: Enter (or the Save button) writes it back */
+function saveEdit(){const r=st.rt[st.editRt];
+ if(r){const tn=W('axEn'),tt=W('axEt');
+  if(tn&&tn.value.trim())r.n=tn.value.trim();
+  if(tt&&tt.value)r.t=tt.value}
+ st.editRt=-1;save();render()}
+ax.addEventListener('keydown',e=>{if((e.target.id==='axEn'||e.target.id==='axEt')&&e.key==='Enter')saveEdit()});
+/* Ctrl+Space = voice, exactly like the reference; when the webview has no
+   speech engine the box simply takes focus instead. */
+function mic(){
+ ax.classList.remove('hide','min');render();
+ const i=W('axIn'),SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){i.placeholder=LT('Voice input is not available here — type instead.');i.focus();beep();
+  setTimeout(()=>{i.placeholder=LT('Ask the agent…')},2500);return}
+ try{const r=new SR();r.lang=document.documentElement.lang||'en';
+  r.onresult=ev=>{i.value=ev.results[0][0].transcript};
+  r.onerror=()=>{};r.start();i.focus()}catch(x){i.focus()}}
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.code==='Space'){e.preventDefault();mic()}});
+/* ── the real desktop, watched: pills are the real apps on screen, and a
+   pill'd app opening is a real interruption line in Activity ─────────── */
+let seen=new Set();
+setInterval(()=>{
+ if(!TAURI)return;
+ const list=realWins(),apps=[];
+ for(const w of list){const a=appName(w.dataset.title);if(a&&!apps.includes(a))apps.push(a);if(apps.length>=5)break}
+ const now=new Set(list.map(w=>w.id));
+ let fresh=false;
+ for(const w of list){const a=appName(w.dataset.title);
+  if(!seen.has(w.id)&&st.ints[a]){
+   pushAct({id:'w'+w.id,pre:a+' '+LT('is open'),txt:a+' is open',kind:'window',s:'ok',who:who(),note:w.dataset.title,win:w.id});
+   beep('blip');fresh=true}}
+ if(apps.join('|')!==st.apps.join('|')){st.apps=apps;fresh=true}
+ seen=now;
+ if(fresh)render();
+},2000);
+/* ── routines: a routine with a time really fires, once that time comes,
+   for as long as Nemo & Nini are open ─────────────────────────────────── */
+setInterval(()=>{
+ const now=new Date();
+ const hhmm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+ const day=now.toDateString();
+ for(const r of st.rt){if(r.on&&r.t===hhmm&&r.last!==day){r.last=day;save();run(r.n)}}
+},20000);
+loadModels();checkEng();
 render();
 })();
 </script>
@@ -4482,13 +4958,16 @@ render();
       el.style.left = w.x + 'px'; el.style.top = w.y + 'px';
       el.style.width = w.w + 'px'; el.style.height = w.h + 'px';
       el.dataset.min = w.minimized ? '1' : '';
+      /* the hub keys off these: id = jump target, title = its real name */
+      el.id = 'rw' + w.id;
+      el.dataset.title = w.title || '';
     }
     for (const [id, el] of boxes) if (!seen.has(id)) { el.remove(); boxes.delete(id) }
   }
 
   function overUI(x, y) {
     const pad = 8;
-    for (const el of [islandEl, nemoEl, buddyEl]) {
+    for (const el of [islandEl, nemoEl, buddyEl, document.getElementById('ax'), document.getElementById('axFab')]) {
       if (!el) continue;
       const cs = getComputedStyle(el);
       if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity || '1') < 0.05) continue;

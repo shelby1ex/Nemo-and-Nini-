@@ -16,10 +16,11 @@ use std::ffi::c_void;
 use serde::Serialize;
 use windows_sys::Win32::Foundation::{HWND, LPARAM, POINT, RECT};
 use windows_sys::Win32::Graphics::Dwm::{DwmGetWindowAttribute, DWMWA_CLOAKED};
+use windows_sys::Win32::System::Threading::GetCurrentThreadId;
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     EnumWindows, FindWindowW, GetClassNameW, GetCursorPos, GetForegroundWindow, GetWindowLongW,
     GetWindowRect, GetWindowTextLengthW, GetWindowTextW, GetWindowThreadProcessId, IsIconic,
-    IsWindowVisible, GWL_EXSTYLE, WS_EX_TOOLWINDOW,
+    IsWindow, IsWindowVisible, GWL_EXSTYLE, WS_EX_TOOLWINDOW,
 };
 
 /// Shell / hidden windows we never want to treat as a "real" app window.
@@ -202,4 +203,186 @@ pub fn cursor(ox: i32, oy: i32, scale: f64) -> Option<(f64, f64)> {
         }
     }
     Some(((p.x - ox) as f64 / scale, (p.y - oy) as f64 / scale))
+}
+
+/* ── Agent Hub helpers ───────────────────────────────────────────────────
+   Three real things the hub asks of the desktop: bring a window forward
+   ("click a step to jump to its window"), snap the screen ("+ Screen"
+   context), read the clipboard ("+ Clipboard" context). All of it goes
+   through Win32 — the web layer never gets raw OS access. */
+
+/// Bring a real window to the front. `id` is the window id the desktop
+/// watcher already reports (the same one the hub's boxes are keyed by).
+#[tauri::command]
+pub fn focus_window(id: i64) -> Result<(), String> {
+    use windows_sys::Win32::System::Threading::AttachThreadInput;
+    use windows_sys::Win32::UI::WindowsAndMessaging::{
+        BringWindowToTop, SetForegroundWindow, ShowWindow, SW_RESTORE,
+    };
+    unsafe {
+        let hwnd = id as isize as HWND;
+        if hwnd.is_null() || IsWindow(hwnd) == 0 {
+            return Err("that window is gone".into());
+        }
+        if IsIconic(hwnd) != 0 {
+            let _ = ShowWindow(hwnd, SW_RESTORE);
+        }
+        /* Windows refuses SetForegroundWindow from a process that is not
+           foreground. The documented workaround is to share input state with
+           the foreground thread for the moment of the switch. */
+        let fg = GetForegroundWindow();
+        let mut t_fg = 0u32;
+        if !fg.is_null() {
+            t_fg = GetWindowThreadProcessId(fg, std::ptr::null_mut());
+        }
+        let t_me = GetWindowThreadProcessId(hwnd, std::ptr::null_mut());
+        if t_fg != 0 {
+            AttachThreadInput(t_fg, GetCurrentThreadId(), 1);
+        }
+        if t_me != 0 && t_me != t_fg {
+            AttachThreadInput(t_me, GetCurrentThreadId(), 1);
+        }
+        let ok = SetForegroundWindow(hwnd);
+        if t_fg != 0 {
+            AttachThreadInput(t_fg, GetCurrentThreadId(), 0);
+        }
+        if t_me != 0 && t_me != t_fg {
+            AttachThreadInput(t_me, GetCurrentThreadId(), 0);
+        }
+        let _ = BringWindowToTop(hwnd);
+        if ok == 0 && GetForegroundWindow() != hwnd {
+            return Err("Windows refused to bring that window forward".into());
+        }
+        Ok(())
+    }
+}
+
+/// Snap the primary monitor into a PNG in the app's data folder and hand
+/// back its path — the hub attaches it to the next task so the agent can
+/// actually look at the screen.
+#[tauri::command]
+pub fn capture_screen(app: tauri::AppHandle) -> Result<String, String> {
+    use windows_sys::Win32::Graphics::Gdi::{
+        BitBlt, CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject, GetDC,
+        GetDIBits, ReleaseDC, SelectObject, BITMAPINFO, BITMAPINFOHEADER, BI_RGB, DIB_RGB_COLORS,
+        HGDIOBJ, SRCCOPY,
+    };
+    use windows_sys::Win32::UI::WindowsAndMessaging::{GetSystemMetrics, SM_CXSCREEN, SM_CYSCREEN};
+
+    unsafe {
+        let w = GetSystemMetrics(SM_CXSCREEN);
+        let h = GetSystemMetrics(SM_CYSCREEN);
+        if w <= 0 || h <= 0 {
+            return Err("no screen to capture".into());
+        }
+        let screen = GetDC(std::ptr::null_mut());
+        if screen.is_null() {
+            return Err("no desktop DC".into());
+        }
+        let mem = CreateCompatibleDC(screen);
+        let bmp = CreateCompatibleBitmap(screen, w, h);
+        let prev = SelectObject(mem, bmp as HGDIOBJ);
+        BitBlt(mem, 0, 0, w, h, screen, 0, 0, SRCCOPY);
+
+        let bmi = BITMAPINFOHEADER {
+            biSize: std::mem::size_of::<BITMAPINFOHEADER>() as u32,
+            biWidth: w,
+            biHeight: -h, // top-down rows
+            biPlanes: 1,
+            biBitCount: 32,
+            biCompression: BI_RGB,
+            biSizeImage: 0,
+            biXPelsPerMeter: 0,
+            biYPelsPerMeter: 0,
+            biClrUsed: 0,
+            biClrImportant: 0,
+        };
+        let mut pixels = vec![0u8; (w * h * 4) as usize];
+        let mut info: BITMAPINFO = std::mem::zeroed();
+        info.bmiHeader = bmi;
+        let got = GetDIBits(
+            mem,
+            bmp,
+            0,
+            h as u32,
+            pixels.as_mut_ptr() as *mut c_void,
+            &mut info as *mut BITMAPINFO,
+            DIB_RGB_COLORS,
+        );
+
+        SelectObject(mem, prev);
+        DeleteObject(bmp as HGDIOBJ);
+        DeleteDC(mem);
+        ReleaseDC(std::ptr::null_mut(), screen);
+        if got == 0 {
+            return Err("could not read the screen".into());
+        }
+
+        /* pixels are BGRA, bottom-up (the DC's own order): flip to RGBA,
+           top-down, and write through the png crate. */
+        let dir = crate::settings::config_dir(&app).join("screenshots");
+        std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+        let stamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_millis())
+            .unwrap_or(0);
+        let path = dir.join(format!("screen-{stamp}.png"));
+        let file = std::fs::File::create(&path).map_err(|e| e.to_string())?;
+        let mut enc = png::Encoder::new(std::io::BufWriter::new(file), w as u32, h as u32);
+        enc.set_color(png::ColorType::Rgba);
+        enc.set_depth(png::BitDepth::Eight);
+        let mut writer = enc.write_header().map_err(|e| e.to_string())?;
+        let mut out = vec![0u8; pixels.len()];
+        for y in 0..h as usize {
+            let src = y * w as usize * 4;
+            for x in 0..w as usize {
+                let s = src + x * 4;
+                let d = src + x * 4;
+                out[d] = pixels[s + 2]; // R
+                out[d + 1] = pixels[s + 1]; // G
+                out[d + 2] = pixels[s]; // B
+                out[d + 3] = 255;
+            }
+        }
+        writer.write_image_data(&out).map_err(|e| e.to_string())?;
+        Ok(path.to_string_lossy().to_string())
+    }
+}
+
+/// The clipboard's plain text, as the hub's "+ Clipboard" chip. Read once,
+/// handed to the agent as part of the next task — nothing is kept anywhere.
+#[tauri::command]
+pub fn clipboard_text() -> Result<String, String> {
+    use windows_sys::Win32::System::DataExchange::{CloseClipboard, GetClipboardData, OpenClipboard};
+    use windows_sys::Win32::System::Memory::{GlobalLock, GlobalSize, GlobalUnlock};
+    use windows_sys::Win32::System::Ole::CF_UNICODETEXT;
+    unsafe {
+        if OpenClipboard(std::ptr::null_mut()) == 0 {
+            return Err("the clipboard is busy".into());
+        }
+        let out = (|| -> Result<String, String> {
+            let h = GetClipboardData(CF_UNICODETEXT.into());
+            if h.is_null() {
+                return Err("there is no text on the clipboard".into());
+            }
+            let size = GlobalSize(h);
+            if size < 2 {
+                return Err("there is no text on the clipboard".into());
+            }
+            let p = GlobalLock(h) as *const u16;
+            if p.is_null() {
+                return Err("the clipboard is locked".into());
+            }
+            let units = size / 2;
+            let mut len = 0;
+            while len < units && *p.add(len) != 0 {
+                len += 1;
+            }
+            let s = String::from_utf16_lossy(std::slice::from_raw_parts(p, len));
+            GlobalUnlock(h);
+            Ok(s)
+        })();
+        CloseClipboard();
+        out
+    }
 }

@@ -27,15 +27,20 @@ reqwest = { version = "0.12", features = ["json", "stream"] }
 futures-util = "0.3"
 tokio = { version = "1", features = ["time"] }
 zip = "2"
+png = "0.17"
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.59", features = [
   "Win32_Foundation",
   "Win32_UI_WindowsAndMessaging",
   "Win32_Graphics_Dwm",
+  "Win32_Graphics_Gdi",
   "Win32_Security",
   "Win32_System_JobObjects",
   "Win32_System_Threading",
+  "Win32_System_Memory",
+  "Win32_System_DataExchange",
+  "Win32_System_Ole",
 ] }
 
 

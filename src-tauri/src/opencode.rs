@@ -45,6 +45,14 @@ impl EngineState {
     }
 }
 
+/// Serializes `start()` end to end. Two callers race in on every launch — the
+/// boot auto-start and the UI's warm-up both call — and a racing second
+/// `stop()` + spawn kills the engine the first one just launched, whose health
+/// wait then times out and stamps "not running" over a perfectly healthy
+/// replacement. One start at a time, and a healthy engine is never respawned.
+static START_LOCK: std::sync::LazyLock<tokio::sync::Mutex<()>> =
+    std::sync::LazyLock::new(|| tokio::sync::Mutex::new(()));
+
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct EngineInfo {
@@ -293,6 +301,17 @@ async fn healthy(port: u16) -> Option<String> {
 /// Start the engine and wait until it answers. Takes the process from any
 /// previous run down first, so calling this twice is safe.
 pub async fn start(app: &AppHandle) -> Result<EngineInfo, String> {
+    let _serial = START_LOCK.lock().await;
+
+    // Someone else may have just brought the engine up while we queued on the
+    // lock (the classic case: boot auto-start racing the UI warm-up). A healthy
+    // engine needs no second spawn — killing and re-spawning it here is what
+    // used to leave the app believing a perfectly alive engine was down.
+    let cur = info(app);
+    if cur.running && healthy(cur.port).await.is_some() {
+        return Ok(cur);
+    }
+
     stop(app);
     kill_stale(app);
 
@@ -465,6 +484,9 @@ pub fn oc_stop(app: AppHandle) -> EngineInfo {
 
 #[tauri::command]
 pub async fn oc_restart(app: AppHandle) -> Result<EngineInfo, String> {
+    // Stop first on purpose: `start()` is now smart enough to keep an engine
+    // that is already healthy, so a restart has to actually take it down.
+    stop(&app);
     start(&app).await
 }
 

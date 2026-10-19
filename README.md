@@ -21,6 +21,16 @@ machine.
   click-through window parked above the real taskbar. It reads the real
   desktop — open windows, the taskbar, the clock — and the two companions walk
   along it, climb onto title bars, and react to what you're doing.
+- **Chat that shows its work.** Every engine step — Thinking, Shell, WebFetch,
+  Search, Read, Edit — appears live in the thread as a work trail with the
+  actual subject (command, file, url), and stays attached to the answer it
+  belongs to. The send button turns into a red **stop** that interrupts
+  without losing the trace.
+- **Alive while it thinks.** Eyes light up the instant you send — a heartbeat
+  of expressions through the whole wait, a thinking face, and live elapsed
+  seconds. After 20 silent seconds the subtitle says the truth: the free tier
+  is queued. The engine itself auto-starts with the app, so the first message
+  never pays the boot.
 - **A local AI engine.** Rust spawns `opencode serve` in an isolated data
   directory, watches its health, and re-emits every SSE event to the webviews —
   the frontend never speaks HTTP itself. Chat lives in one scrolling thread
@@ -30,9 +40,6 @@ machine.
   runtime into the app's own data folder and updates it later from the same
   card (check → download → verify → swap → automatic rollback if the new
   engine doesn't come up).
-- **Agent Hub.** Every line the engine emits — tool calls, reasoning, approvals
-  — appears live in the hub with short status labels (Thinking, WebFetch,
-  Search, Shell, Edit, …). Pending tool permissions are approved from there.
 - **Free models only.** The model picker lists every provider's models whose
   cost is actually zero, grouped by provider and searchable.
 - **Themes, dark/light, and real language switching.** The island and the
@@ -51,7 +58,7 @@ machine.
 ## Project layout
 
 ```
-index.html            the island overlay (companions, chat, Agent Hub)
+index.html            the island overlay (companions, chat, work trail)
 settings.html         the frameless Settings window
 src/
   theme.js            theme catalogue + tokens
@@ -59,6 +66,7 @@ src/
   appearance.js       shared boot: paints theme + language on both windows
 nemo and nini.html    frozen original prototype (reference only)
 src/prototype/mock/   frozen prototype mock (reference only)
+ROADMAP.md            current bugs + the road ahead
 src-tauri/src/
   desktop.rs          overlay geometry, real-window/taskbar polling
   opencode.rs         engine process, health, SSE → Tauri events
